@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    // required for typeorm
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    // end typeorm required
     "target": "es6",
     "module": "commonjs",
     "allowJs": true,
@@ -23,6 +27,8 @@
     "resolveJsonModule": true
   },
   "exclude": [
-    "tests"
+    "tests",
+    "node_modules",
+    "dist"
   ]
 }
