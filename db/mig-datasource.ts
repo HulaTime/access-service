@@ -2,6 +2,8 @@ import { DataSource } from 'typeorm';
 
 import Account from '../repositories/Account';
 import Users from '../repositories/Users';
+import Applications from '../repositories/Applications';
+import Roles from '../repositories/Roles';
 
 export const AccessDataSource = new DataSource({
   type: 'postgres',
@@ -11,9 +13,8 @@ export const AccessDataSource = new DataSource({
   password: 'myspoke',
   database: 'myspoke',
   schema: 'access',
-  // synchronize: true,
   logging: true,
-  entities: [Account, Users],
+  entities: [Account, Users, Applications, Roles],
   subscribers: [],
   migrations: ['./db/migrations/*'],
   migrationsTableName: 'access_migrations'
