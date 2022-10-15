@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 
 import Account from '../repositories/Account';
+import Users from '../repositories/Users';
 
 export const AccessDataSource = new DataSource({
   type: 'postgres',
@@ -12,7 +13,7 @@ export const AccessDataSource = new DataSource({
   schema: 'access',
   // synchronize: true,
   logging: true,
-  entities: [Account],
+  entities: [Account, Users],
   subscribers: [],
   migrations: ['./db/migrations/*'],
   migrationsTableName: 'access_migrations'

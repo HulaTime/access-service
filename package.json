@@ -16,7 +16,8 @@
     "migrations:down": "typeorm-ts-node-commonjs migration:revert -d ./db/mig-datasource.ts",
     "migrations:create": "typeorm migration:create",
     "premigrations:generate": "npm run build",
-    "migrations:generate": "typeorm-ts-node-commonjs migration:generate -d ./db/mig-datasource.ts -p"
+    "migrations:generate": "typeorm-ts-node-commonjs migration:generate -d ./db/mig-datasource.ts -p",
+    "postmigrations:generate": "npm run migrations:up"
   },
   "keywords": [
     "express",

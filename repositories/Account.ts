@@ -7,4 +7,7 @@ export default class Accounts {
 
   @Column()
   name!: string
+
+  @Column({ nullable: false })
+  description?: string
 }
