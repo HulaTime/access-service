@@ -2,12 +2,12 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export default class Accounts {
-  @PrimaryColumn()
+  @PrimaryColumn({ nullable: false })
   id!: string
 
-  @Column()
+  @Column({ nullable: false })
   name!: string
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   description?: string
 }

@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm';
 
-import Account from '../src/repositories/AccountsRepository';
+import AccountsRepository from '../src/repositories/AccountsRepository';
 import Users from '../src/repositories/Users';
 import Applications from '../src/repositories/Applications';
 import Roles from '../src/repositories/Roles';
 
-export const AccessDataSource = new DataSource({
+const datasource = new DataSource({
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -13,9 +13,10 @@ export const AccessDataSource = new DataSource({
   password: 'myspoke',
   database: 'myspoke',
   schema: 'access',
-  logging: true,
-  entities: [Account, Users, Applications, Roles],
-  subscribers: [],
-  migrations: ['./db/migrations/*'],
-  migrationsTableName: 'access_migrations'
+  // logging: true,
+  entities: [AccountsRepository, Users, Applications, Roles],
 });
+
+datasource.initialize();
+
+export default datasource;

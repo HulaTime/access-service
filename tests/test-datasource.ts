@@ -5,7 +5,7 @@ import Users from '../src/repositories/Users';
 import Applications from '../src/repositories/Applications';
 import Roles from '../src/repositories/Roles';
 
-export const AccessDataSource = new DataSource({
+export default new DataSource({
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -13,9 +13,6 @@ export const AccessDataSource = new DataSource({
   password: 'myspoke',
   database: 'myspoke',
   schema: 'access',
-  logging: true,
+  // logging: true,
   entities: [Account, Users, Applications, Roles],
-  subscribers: [],
-  migrations: ['./db/migrations/*'],
-  migrationsTableName: 'access_migrations'
 });

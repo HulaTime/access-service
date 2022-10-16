@@ -1,15 +1,15 @@
 import { Column, Entity, OneToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 
-import Accounts from './Account';
+import AccountsRepository from './AccountsRepository';
 
 @Entity()
 export default class Applications {
   @PrimaryColumn()
   id!: string
 
-  @OneToOne(() => Accounts)
+  @OneToOne(() => AccountsRepository)
   @JoinColumn()
-  account!: Accounts
+  account!: AccountsRepository
 
   @Column()
   name!: string

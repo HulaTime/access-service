@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn, JoinTable, ManyToOne, ManyToMany } from 'typeorm';
 
-import Accounts from './Account';
+import AccountsRepository from './AccountsRepository';
 import Users from './Users';
 import Applications from './Applications';
 
@@ -9,8 +9,8 @@ export default class Roles {
   @PrimaryColumn()
   id!: string;
 
-  @ManyToOne(() => Accounts, (account) => account.id)
-  account!: Accounts;
+  @ManyToOne(() => AccountsRepository, (account) => account.id)
+  account!: AccountsRepository;
 
   @ManyToMany(() => Users)
   @JoinTable()

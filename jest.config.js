@@ -15,17 +15,16 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   testEnvironment: 'node',
   testMatch: ['**/?(*.)+(spec|test).ts?(x)'],
-  testResultsProcessor: 'jest-bamboo-reporter',
   reporters: ['default', 'jest-junit'],
   verbose: true,
   collectCoverage: true,
   coverageReporters: ['text', 'json', 'json-summary', 'lcov', 'clover'],
   coverageThreshold: {
     global: {
-      branches: COVERAGE_LEVEL,
-      functions: COVERAGE_LEVEL,
-      lines: COVERAGE_LEVEL,
-      statements: COVERAGE_LEVEL,
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
     },
   },
 };
