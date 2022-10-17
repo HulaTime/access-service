@@ -11,11 +11,14 @@ export default class Users {
   @JoinColumn()
   account!: AccountsRepository
 
-  @Column()
-  name!: string
+  @Column({ unique: true })
+  email!: string
 
-  @Column()
-  username!: string
+  @Column({ nullable: true })
+  name?: string
+
+  @Column({ nullable: true })
+  username?: string
 
   @Column()
   password!: string

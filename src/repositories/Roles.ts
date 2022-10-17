@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, JoinTable, ManyToOne, ManyToMany } from 'typeorm';
 
 import AccountsRepository from './AccountsRepository';
-import Users from './Users';
+import Users from './UsersRepository';
 import Applications from './Applications';
 
 @Entity()

@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: access
+  description: This service is designed to manage all resources and functional flows surrounding user and application authorization and authentication
+servers:
+  - url: /access
+paths:
+  /accounts:
+    post:
+      operationId: CreateAccount
+      tags:
+        - accounts
+      summary: Create a new Account
+      description: Create a new Account by supplying basic information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        201:
+          description: Successful creation of an account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+
+components:
+  schemas:
+    AccountRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: The name of the account
+          example: Johns Place
+        email:
+          type: string
+          description: The email address of the account owner
+          example: john@smith.co.uk
+        password:
+          type: string
+          description: The user password of the account owner
+        description:
+          type: string
+          maxLength: 200
+          description: An optional short description of the account
+
+    AccountResponse:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A generated unique identifier for the newly created account
+        name:
+          type: string
+          description: The name of the account
+          example: Johns Place
+        email:
+          type: string
+          description: The email address of the account owner
+          example: john@smith.co.uk
+        description:
+          type: string
+          maxLength: 200
+          description: An optional short description of the account
+

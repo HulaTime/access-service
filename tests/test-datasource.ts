@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 
 import Account from '../src/repositories/AccountsRepository';
-import Users from '../src/repositories/Users';
+import Users from '../src/repositories/UsersRepository';
 import Applications from '../src/repositories/Applications';
 import Roles from '../src/repositories/Roles';
 
