@@ -15,7 +15,7 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   testEnvironment: 'node',
   testMatch: ['**/?(*.)+(spec|test).ts?(x)'],
-  reporters: ['default', 'jest-junit'],
+  // reporters: ['default', 'jest-junit'],
   verbose: true,
   collectCoverage: true,
   coverageReporters: ['text', 'json', 'json-summary', 'lcov', 'clover'],

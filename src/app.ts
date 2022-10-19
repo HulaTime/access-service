@@ -5,6 +5,7 @@ import * as OpenApiValidator from 'express-openapi-validator';
 
 import { queryStringDepth, serviceName } from './config';
 import routers from './routers';
+import { ConflictError } from './errors';
 
 const app: Express = express();
 
@@ -16,17 +17,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(OpenApiValidator.middleware({
   apiSpec: `${__dirname}/../api.yaml`,
   validateRequests: true,
-  validateResponses: true,
+  validateResponses: false,
 }));
 
 app.use(`/${serviceName}/accounts`, routers.accounts);
 
-const errorMiddleware: ErrorRequestHandler = (err, _, res, next) => {
-  res.status(err.status || 500).json({
-    message: err.message,
-    errors: err.errors,
-  });
-  next();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const errorMiddleware: ErrorRequestHandler = (err, _req, res, _next) => {
+  if (err instanceof ConflictError) {
+    return res.status(409)
+      .json({
+        message: err.message,
+      });
+  }
+
+  return res.status(err.status || 500)
+    .json({
+      message: err.message,
+      errors: err.errors,
+    });
 };
 
 app.use(errorMiddleware);

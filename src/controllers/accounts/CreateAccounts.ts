@@ -1,31 +1,31 @@
 import Logger from 'bunyan';
-import { serializeError } from 'serialize-error';
 
 import Accounts from '../../models/Accounts';
 import Users from '../../models/Users';
 import { components } from '../../../types/api';
+import { ConflictError } from '../../errors';
 
 export default class CreateAccounts {
-  private accounts: Accounts;
+  private readonly account: Accounts;
 
-  private users: Users;
+  private readonly user: Users;
 
-    private readonly data: components['schemas']['AccountRequest'];
+  private readonly data: components['schemas']['AccountRequest'];
 
-    constructor(data: components['schemas']['AccountRequest'], AccountsModel?:Accounts, UsersModel?:Users) {
-      this.data = data;
-      this.accounts = AccountsModel ?? new Accounts(this.data);
-      this.users = UsersModel ?? new Users(this.data);
+  constructor(data: components['schemas']['AccountRequest'], AccountsModel?: Accounts, UsersModel?: Users) {
+    this.data = data;
+    this.account = AccountsModel ?? new Accounts(this.data);
+    this.user = UsersModel ?? new Users(this.data);
+  }
+
+  async exec(logger: Logger): Promise<{ account: Accounts; user: Users }> {
+    const existingUser = await this.user.getByEmail(this.data.email);
+    if (existingUser) {
+      logger.info(`User ${this.data.email} already has an account`);
+      throw new ConflictError(`User ${this.data.email} already has an account`);
     }
-
-    async exec(logger: Logger): Promise<{ account: Accounts; user: Users }> {
-      try {
-        const account = await this.accounts.create();
-        const user = await this.users.create(this.data.password);
-        return { account, user };
-      } catch (err) {
-        logger.error({ error: serializeError(err) }, 'SHIT');
-        throw err;
-      }
-    }
+    const account = await this.account.create();
+    const user = await this.user.create(this.data.password);
+    return { account, user };
+  }
 }

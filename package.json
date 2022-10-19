@@ -7,7 +7,7 @@
     "prebuild": "rm -rf dist",
     "build": "tsc && cp api.yaml dist",
     "lint": "eslint src/**/*.ts",
-    "test": "node_modules/.bin/jest --detectOpenHandles --collectCoverage --forceExit",
+    "test": "node_modules/.bin/jest --detectOpenHandles --collectCoverage",
     "npm-check": "npm-check -u",
     "prestart": "npm run build",
     "start": "node dist/src/index.js",
@@ -16,7 +16,6 @@
     "migrations:create": "typeorm migration:create",
     "premigrations:generate": "npm run build",
     "migrations:generate": "typeorm-ts-node-commonjs migration:generate -d ./db/mig-datasource.ts -p",
-    "postmigrations:generate": "npm run migrations:up",
     "generate:docs": "typedoc --plugin typedoc-plugin-markdown  src/index.ts",
     "generate:types": "openapi-typescript api.yaml --output types/api.d.ts"
   },

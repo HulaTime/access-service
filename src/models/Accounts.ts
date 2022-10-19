@@ -39,5 +39,4 @@ export default class Accounts implements IAccounts {
     });
     return this;
   }
-
 }

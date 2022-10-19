@@ -23,7 +23,8 @@ datasource.initialize().then(() => {
   });
 });
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   logger.info('SIGTERM signal received: closing HTTP server');
+  await datasource.destroy();
   server && server.close();
 });
