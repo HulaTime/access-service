@@ -4,9 +4,12 @@
  */
 
 export interface paths {
-  '/accounts': {
+  "/accounts": {
     /** Create a new Account by supplying basic information */
-    post: operations['CreateAccount'];
+    post: operations["CreateAccount"];
+  };
+  "/accounts/{id}": {
+    get: operations["GetAccount"];
   };
 }
 
@@ -28,7 +31,7 @@ export interface components {
       /** @description An optional short description of the account */
       description?: string;
     };
-    AccountResponse: {
+    CreateAccountResponse: {
       /**
        * Format: uuid
        * @description A generated unique identifier for the newly created account
@@ -47,6 +50,20 @@ export interface components {
       /** @description An optional short description of the account */
       description?: string;
     };
+    AccountResponse: {
+      /**
+       * Format: uuid
+       * @description A generated unique identifier for the newly created account
+       */
+      id: string;
+      /**
+       * @description The name of the account
+       * @example Johns Place
+       */
+      name: string;
+      /** @description An optional short description of the account */
+      description?: string;
+    };
   };
 }
 
@@ -57,13 +74,29 @@ export interface operations {
       /** Successful creation of an account */
       201: {
         content: {
-          'application/json': components['schemas']['AccountResponse'];
+          "application/json": components["schemas"]["CreateAccountResponse"];
         };
       };
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['AccountRequest'];
+        "application/json": components["schemas"]["AccountRequest"];
+      };
+    };
+  };
+  GetAccount: {
+    parameters: {
+      path: {
+        /** primary id, uuid of the account to be retrieved */
+        id: string;
+      };
+    };
+    responses: {
+      /** Successful creation of an account */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AccountResponse"];
+        };
       };
     };
   };

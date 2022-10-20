@@ -24,6 +24,27 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/CreateAccountResponse'
+
+  /accounts/{id}:
+    get:
+      operationId: GetAccount
+      tags:
+        - accounts
+      summary: Get an existing account by id
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: primary id, uuid of the account to be retrieved
+      responses:
+        200:
+          description: Successful creation of an account
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/AccountResponse'
 
 components:
@@ -52,8 +73,9 @@ components:
           maxLength: 200
           description: An optional short description of the account
 
-    AccountResponse:
+    CreateAccountResponse:
       type: object
+      additionalProperties: false
       required:
         - id
         - name
@@ -71,6 +93,26 @@ components:
           type: string
           description: The email address of the account owner
           example: john@smith.co.uk
+        description:
+          type: string
+          maxLength: 200
+          description: An optional short description of the account
+
+    AccountResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A generated unique identifier for the newly created account
+        name:
+          type: string
+          description: The name of the account
+          example: Johns Place
         description:
           type: string
           maxLength: 200
