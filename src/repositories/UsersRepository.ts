@@ -4,22 +4,25 @@ import AccountsRepository from './AccountsRepository';
 
 @Entity()
 export default class Users {
-  @PrimaryColumn()
-  id!: string
+  @PrimaryColumn({ nullable: false })
+  id!: string;
 
-  @OneToOne(() => AccountsRepository)
+  @OneToOne(() => AccountsRepository, { nullable: false })
   @JoinColumn()
-  account!: AccountsRepository
+  account!: AccountsRepository;
 
-  @Column({ unique: true })
-  email!: string
-
-  @Column({ nullable: true })
-  name?: string
+  @Column({ unique: true, nullable: false })
+  email!: string;
 
   @Column({ nullable: true })
-  username?: string
+  name?: string;
 
-  @Column()
-  password!: string
+  @Column({ nullable: true })
+  username?: string;
+
+  @Column({ nullable: false })
+  password!: string;
+
+  @Column({ nullable: false, default: true })
+  isAccountOwner!: boolean;
 }

@@ -2,30 +2,24 @@ import { Column, Entity, PrimaryColumn, JoinTable, ManyToOne, ManyToMany } from 
 
 import AccountsRepository from './AccountsRepository';
 import Users from './UsersRepository';
-import Applications from './Applications';
+import ApplicationsRepository from './ApplicationsRepository';
 
 @Entity()
 export default class Roles {
-  @PrimaryColumn()
+  @PrimaryColumn({ nullable: false })
   id!: string;
 
   @ManyToOne(() => AccountsRepository, (account) => account.id)
   account!: AccountsRepository;
 
-  @ManyToMany(() => Users)
+  @ManyToMany(() => Users, { nullable: false })
   @JoinTable()
   users!: Users;
 
-  @ManyToMany(() => Applications)
+  @ManyToMany(() => ApplicationsRepository, { nullable: false })
   @JoinTable()
-  applications!: Applications;
+  applications!: ApplicationsRepository;
 
-  @Column()
+  @Column({ nullable: false })
   name!: string;
-
-  @Column()
-  username!: string;
-
-  @Column()
-  password!: string;
 }

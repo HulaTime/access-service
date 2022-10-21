@@ -1,9 +1,10 @@
 import { DataSource } from 'typeorm';
 
-import Account from '../src/repositories/AccountsRepository';
+import Accounts from '../src/repositories/AccountsRepository';
 import Users from '../src/repositories/UsersRepository';
-import Applications from '../src/repositories/Applications';
-import Roles from '../src/repositories/Roles';
+import Applications from '../src/repositories/ApplicationsRepository';
+import Roles from '../src/repositories/RolesRepository';
+import Policies from '../src/repositories/PoliciesRepository';
 
 export const AccessDataSource = new DataSource({
   type: 'postgres',
@@ -14,7 +15,7 @@ export const AccessDataSource = new DataSource({
   database: 'myspoke',
   schema: 'access',
   logging: true,
-  entities: [Account, Users, Applications, Roles],
+  entities: [Accounts, Users, Applications, Roles, Policies],
   subscribers: [],
   migrations: ['./db/migrations/*'],
   migrationsTableName: 'access_migrations'

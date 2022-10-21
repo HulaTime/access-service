@@ -1,9 +1,10 @@
 import { DataSource } from 'typeorm';
 
-import AccountsRepository from '../src/repositories/AccountsRepository';
+import Accounts from '../src/repositories/AccountsRepository';
 import Users from '../src/repositories/UsersRepository';
-import Applications from '../src/repositories/Applications';
-import Roles from '../src/repositories/Roles';
+import Applications from '../src/repositories/ApplicationsRepository';
+import Roles from '../src/repositories/RolesRepository';
+import Policies from '../src/repositories/PoliciesRepository';
 
 const datasource = new DataSource({
   type: 'postgres',
@@ -14,7 +15,7 @@ const datasource = new DataSource({
   database: 'myspoke',
   schema: 'access',
   // logging: true,
-  entities: [AccountsRepository, Users, Applications, Roles],
+  entities: [Accounts, Users, Applications, Roles, Policies],
 });
 
 datasource.initialize();

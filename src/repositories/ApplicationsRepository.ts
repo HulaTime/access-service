@@ -4,22 +4,22 @@ import AccountsRepository from './AccountsRepository';
 
 @Entity()
 export default class Applications {
-  @PrimaryColumn()
+  @PrimaryColumn({ nullable: false })
   id!: string
 
-  @OneToOne(() => AccountsRepository)
+  @OneToOne(() => AccountsRepository, { nullable: false })
   @JoinColumn()
   account!: AccountsRepository
 
-  @Column()
+  @Column({ nullable: false })
   name!: string
 
-  @Column()
+  @Column({ nullable: false })
   clientId!: string
 
-  @Column()
+  @Column({ nullable: false })
   clientSecret!: string
 
-  @Column()
+  @Column({ nullable: true })
   description?: string
 }
