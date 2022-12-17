@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: myspoke
+      POSTGRES_USER: myspoke
+      POSTGRES_PASSWORD: myspoke
+    ports:
+      - 54320:5432

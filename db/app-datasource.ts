@@ -9,7 +9,7 @@ import Policies from '../src/repositories/PoliciesRepository';
 const datasource = new DataSource({
   type: 'postgres',
   host: 'localhost',
-  port: 5432,
+  port: 54320,
   username: 'myspoke',
   password: 'myspoke',
   database: 'myspoke',

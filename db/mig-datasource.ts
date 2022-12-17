@@ -9,7 +9,7 @@ import Policies from '../src/repositories/PoliciesRepository';
 export const AccessDataSource = new DataSource({
   type: 'postgres',
   host: 'localhost',
-  port: 5432,
+  port: 54320,
   username: 'myspoke',
   password: 'myspoke',
   database: 'myspoke',
@@ -20,3 +20,4 @@ export const AccessDataSource = new DataSource({
   migrations: ['./db/migrations/*'],
   migrationsTableName: 'access_migrations'
 });
+

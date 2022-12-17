@@ -1,28 +1,29 @@
 import Logger from 'bunyan';
 import { v4 as uuid } from 'uuid';
 
-import Users from '../../models/Users';
+// import User from '../../models/User';
 import { components } from '../../../types/api';
 import { ConflictError } from '../../errors';
 import appDatasource from '../../../db/app-datasource';
-import { DataSource } from 'typeorm';
-import { AccountsRepository } from '../../repositories';
+import { Repository } from 'typeorm';
+import { AccountsRepository, UsersRepository } from '../../repositories';
 
 export default class CreateAccounts {
-  private readonly user: Users;
+  private readonly accountsRepository: Repository<AccountsRepository>;
+
+  private readonly usersRepository: Repository<UsersRepository>;
 
   private readonly data: components['schemas']['AccountRequest'];
 
-  private dataSource: DataSource;
 
-  constructor(data: components['schemas']['AccountRequest'], UsersModel?: Users) {
+  constructor(data: components['schemas']['AccountRequest']) {
     this.data = data;
-    this.dataSource = appDatasource;
-    this.user = UsersModel ?? new Users(this.data);
+    this.accountsRepository = appDatasource.getRepository(AccountsRepository);
+    this.usersRepository = appDatasource.getRepository(UsersRepository);
   }
 
-  async exec(logger: Logger): Promise<{ account: components['schemas']['AccountResponse']; user: Users }> {
-    const existingUser = await this.user.getByEmail(this.data.email);
+  async exec(logger: Logger): Promise<{ account: components['schemas']['AccountResponse']; user: { } }> {
+    const existingUser = await this.usersRepository.findOneBy({ email: this.data.email });
     if (existingUser) {
       logger.info(`User ${this.data.email} already has an account`);
       throw new ConflictError(`User ${this.data.email} already has an account`);
@@ -33,8 +34,9 @@ export default class CreateAccounts {
       name: this.data.name,
       description: this.data.description
     };
-    await this.dataSource.getRepository(AccountsRepository).insert(account);
-    const user = await this.user.create(this.data.password);
-    return { account, user };
+    const result = await this.accountsRepository.insert(account);
+    console.log('-> result', result);
+    // const user = await this.user.create(this.data.password);
+    return { account, user: {} };
   }
 }
