@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { Like } from 'typeorm';
+import { v4 as uuid } from 'uuid';
 
 import app from '../../src/app';
 import testDatasource from '../test-datasource';
@@ -7,17 +8,24 @@ import AccountsRepository from '../../src/repositories/AccountsRepository';
 import UsersRepository from '../../src/repositories/UsersRepository';
 import appDatasource from '../../db/app-datasource';
 
+jest.mock('uuid', () => ({
+  v4: jest.fn()
+}));
+
+const STUB_UUID_RESPONSE = '1923ccee-d63b-46bd-84fb-edf65936a6d7';
+
 describe('POST /accounts', () => {
   beforeAll(async () => {
+    (uuid as jest.Mock).mockReturnValue(STUB_UUID_RESPONSE);
     await testDatasource.initialize();
   });
 
   afterEach(async () => {
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    await accountsRepository.delete({ name: Like('%test%') });
-
     const usersRepository = testDatasource.getRepository(UsersRepository);
     await usersRepository.delete({ email: Like('%test%') });
+
+    const accountsRepository = testDatasource.getRepository(AccountsRepository);
+    await accountsRepository.delete({ name: Like('%test%') });
   });
 
   afterAll(async () => {
@@ -25,7 +33,7 @@ describe('POST /accounts', () => {
     await testDatasource.destroy();
   });
 
-  test('I can create a new account', async () => {
+  test('I can create a new account, with an associated user', async () => {
     const inputData = {
       name: 'test-account',
       email: 'dingleberry@tests.co.uk',
@@ -38,7 +46,10 @@ describe('POST /accounts', () => {
       .expect(201);
     const { password, ...inputDataMinusPassword } = inputData;
     expect(body)
-      .toMatchObject(inputDataMinusPassword);
+      .toEqual({
+        ...inputDataMinusPassword,
+        id: STUB_UUID_RESPONSE,
+      });
     expect(body.id)
       .toBeDefined();
     const accountsRepository = testDatasource.getRepository(AccountsRepository);

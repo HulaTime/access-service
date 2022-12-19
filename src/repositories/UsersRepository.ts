@@ -15,9 +15,6 @@ export default class Users {
   email!: string;
 
   @Column({ nullable: true })
-  name?: string;
-
-  @Column({ nullable: true })
   username?: string;
 
   @Column({ nullable: false })

@@ -18,9 +18,9 @@ router.post<Record<never, never>,
     try {
       const { body } = req;
       const controller = new controllers.CreateAccounts(body);
-      const { account, user } = await controller.exec(logger);
+      const result = await controller.exec(logger);
       return res.status(201)
-        .json({ id: account.id, name: account.name, description: account.description, email: user.email });
+        .json(result);
     } catch (err) {
       logger.error({ error: serializeError(err) }, 'Failed');
       return next(err);

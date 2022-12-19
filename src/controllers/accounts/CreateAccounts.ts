@@ -1,4 +1,5 @@
 import Logger from 'bunyan';
+import * as argon2 from 'argon2';
 import { v4 as uuid } from 'uuid';
 
 // import User from '../../models/User';
@@ -22,7 +23,7 @@ export default class CreateAccounts {
     this.usersRepository = appDatasource.getRepository(UsersRepository);
   }
 
-  async exec(logger: Logger): Promise<{ account: components['schemas']['AccountResponse']; user: { } }> {
+  async exec(logger: Logger): Promise<components['schemas']['CreateAccountResponse']> {
     const existingUser = await this.usersRepository.findOneBy({ email: this.data.email });
     if (existingUser) {
       logger.info(`User ${this.data.email} already has an account`);
@@ -34,9 +35,19 @@ export default class CreateAccounts {
       name: this.data.name,
       description: this.data.description
     };
-    const result = await this.accountsRepository.insert(account);
-    console.log('-> result', result);
-    // const user = await this.user.create(this.data.password);
-    return { account, user: {} };
+    await this.accountsRepository.insert(account);
+    const user = {
+      id: uuid(),
+      email: this.data.email,
+      password: await argon2.hash(this.data.password),
+      account: { id: account.id },
+    };
+    await this.usersRepository.insert(user);
+    return {
+      id: account.id,
+      name: account.name,
+      description: account.description,
+      email: user.email,
+    };
   }
 }
