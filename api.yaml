@@ -94,6 +94,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
 
+  /authenticate:
+    post:
+      operationId: Authenticate
+      tags:
+        - authenticate
+      summary: Authenticate a user or application
+      description: Authenticate a user or application
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/AuthenticateUser'
+                - $ref: '#/components/schemas/AuthenticateApp'
+      responses:
+        200:
+          description: Successful creation of an account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticateRes'
+
 components:
   schemas:
     AccountRequest:
@@ -214,6 +236,7 @@ components:
 
     AccountAppRequest:
       type: object
+      additionalProperties: false
       required:
         - name
       properties:
@@ -257,3 +280,45 @@ components:
         description:
           type: string
           description: A description of the account application being created
+
+    AuthenticateUser:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required:
+            - email
+            - password
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+        - type: object
+          required:
+            - username
+            - password
+          properties:
+            username:
+              type: string
+            password:
+              type: string
+
+    AuthenticateApp:
+      type: object
+      additionalProperties: false
+      required:
+        - clientId
+        - clientSecret
+      properties:
+        clientId:
+          type: string
+        clientSecret:
+          type: string
+
+    AuthenticateRes:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string

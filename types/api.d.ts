@@ -19,6 +19,10 @@ export interface paths {
     /** Create a new User by supplying login credentials at a minimum */
     post: operations["CreateUser"];
   };
+  "/authenticate": {
+    /** Authenticate a user or application */
+    post: operations["Authenticate"];
+  };
 }
 
 export interface components {
@@ -136,6 +140,22 @@ export interface components {
       /** @description A description of the account application being created */
       description?: string;
     };
+    AuthenticateUser:
+      | {
+          email: string;
+          password: string;
+        }
+      | {
+          username: string;
+          password: string;
+        };
+    AuthenticateApp: {
+      clientId: string;
+      clientSecret: string;
+    };
+    AuthenticateRes: {
+      accessToken: string;
+    };
   };
 }
 
@@ -207,6 +227,24 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["UserRequest"];
+      };
+    };
+  };
+  /** Authenticate a user or application */
+  Authenticate: {
+    responses: {
+      /** Successful creation of an account */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AuthenticateRes"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json":
+          | components["schemas"]["AuthenticateUser"]
+          | components["schemas"]["AuthenticateApp"];
       };
     };
   };

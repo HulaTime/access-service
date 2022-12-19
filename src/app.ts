@@ -22,14 +22,13 @@ app.use(OpenApiValidator.middleware({
 
 app.use(`/${serviceName}/accounts`, routers.accounts);
 app.use(`/${serviceName}/users`, routers.users);
+app.use(`/${serviceName}/authenticate`, routers.authenticate);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorMiddleware: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ConflictError) {
     return res.status(409)
-      .json({
-        message: err.message,
-      });
+      .json({ message: err.message });
   }
 
   return res.status(err.status || 500)
