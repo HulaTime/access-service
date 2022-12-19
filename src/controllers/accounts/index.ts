@@ -1,7 +1,9 @@
 import CreateAccounts from './CreateAccounts';
 import GetAccount from './GetAccount';
+import CreateAccountApplications from './applications/CreateAccountApplications';
 
 export default {
   CreateAccounts,
-  GetAccount
+  GetAccount,
+  CreateAccountApplications,
 };

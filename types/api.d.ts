@@ -11,8 +11,12 @@ export interface paths {
   "/accounts/{id}": {
     get: operations["GetAccount"];
   };
+  "/accounts/{id}/applications": {
+    /** Create a new Account application */
+    post: operations["CreateAccountApplication"];
+  };
   "/users": {
-    /** Create a new Account by supplying basic information */
+    /** Create a new User by supplying login credentials at a minimum */
     post: operations["CreateUser"];
   };
 }
@@ -103,6 +107,35 @@ export interface components {
       /** @description An optional short description of the account */
       accountId?: string;
     };
+    AccountAppRequest: {
+      /** @description The name of the account application */
+      name: string;
+      /** @description A description of the account application being created */
+      description?: string;
+    };
+    CreateAccountAppResponse: {
+      /**
+       * Format: uuid
+       * @description primary identifier for the created account application
+       */
+      id: string;
+      /** @description The name of the account application */
+      name: string;
+      /**
+       * Format: uuid
+       * @description The id for the account this application is associated with
+       */
+      accountId: string;
+      /**
+       * Format: uuid
+       * @description The client id for the application, should be exchanged for an access token via the authenticate endpoint in order to make authenticated requests to accessible apis.
+       */
+      clientId: string;
+      /** @description The client secret for the application, should be exchanged with the clientId for an access token via the authenticate endpoint in order to make authenticated requests to accessible apis. MAKE SURE YOU COPY AND SAVE THIS VALUE, IT IS ONLY RETURNED ONCE AND CANNOT BE ACCESSED LATER. */
+      clientSecret: string;
+      /** @description A description of the account application being created */
+      description?: string;
+    };
   };
 }
 
@@ -139,7 +172,29 @@ export interface operations {
       };
     };
   };
-  /** Create a new Account by supplying basic information */
+  /** Create a new Account application */
+  CreateAccountApplication: {
+    parameters: {
+      path: {
+        /** primary id for the account the application will belong to */
+        id: string;
+      };
+    };
+    responses: {
+      /** Successful creation of an account */
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateAccountAppResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AccountAppRequest"];
+      };
+    };
+  };
+  /** Create a new User by supplying login credentials at a minimum */
   CreateUser: {
     responses: {
       /** Successful creation of an account */

@@ -47,13 +47,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccountResponse'
 
+  /accounts/{id}/applications:
+    post:
+      operationId: CreateAccountApplication
+      tags:
+        - applications
+      summary: Create a new Account Application
+      description: Create a new Account application
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: primary id for the account the application will belong to
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountAppRequest'
+      responses:
+        201:
+          description: Successful creation of an account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountAppResponse'
+
   /users:
     post:
       operationId: CreateUser
       tags:
         - users
-      summary: Create a new Account user
-      description: Create a new Account by supplying basic information
+      summary: Create a new User
+      description: Create a new User by supplying login credentials at a minimum
       requestBody:
         content:
           application/json:
@@ -184,3 +211,49 @@ components:
           type: string
           maxLength: 200
           description: An optional short description of the account
+
+    AccountAppRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the account application
+        description:
+          type: string
+          description: A description of the account application being created
+
+    CreateAccountAppResponse:
+      type: object
+      required:
+        - id
+        - name
+        - accountId
+        - clientId
+        - clientSecret
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: primary identifier for the created account application
+        name:
+          type: string
+          description: The name of the account application
+        accountId:
+          type: string
+          format: uuid
+          description: The id for the account this application is associated with
+        clientId:
+          type: string
+          format: uuid
+          description: The client id for the application, should be exchanged for an access token via the authenticate
+            endpoint in order to make authenticated requests to accessible apis.
+        clientSecret:
+          type: string
+          description: The client secret for the application, should be exchanged with the clientId for an access token 
+            via the authenticate endpoint in order to make authenticated requests to accessible apis.
+            MAKE SURE YOU COPY AND SAVE THIS VALUE, IT IS ONLY RETURNED ONCE AND CANNOT BE ACCESSED LATER.
+        description:
+          type: string
+          description: A description of the account application being created

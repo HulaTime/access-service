@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryColumn, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column, Entity, PrimaryColumn, JoinColumn, ManyToOne, 
+} from 'typeorm';
 
 import AccountsRepository from './AccountsRepository';
 

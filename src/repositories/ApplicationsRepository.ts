@@ -1,4 +1,6 @@
-import { Column, Entity, OneToOne, PrimaryColumn, JoinColumn } from 'typeorm';
+import {
+  Column, Entity, PrimaryColumn, JoinColumn, ManyToOne,
+} from 'typeorm';
 
 import AccountsRepository from './AccountsRepository';
 
@@ -7,7 +9,7 @@ export default class Applications {
   @PrimaryColumn({ nullable: false })
   id!: string
 
-  @OneToOne(() => AccountsRepository, { nullable: false })
+  @ManyToOne(() => AccountsRepository, { nullable: false })
   @JoinColumn()
   account!: AccountsRepository
 

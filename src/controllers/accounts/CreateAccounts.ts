@@ -2,10 +2,9 @@ import Logger from 'bunyan';
 import * as argon2 from 'argon2';
 import { v4 as uuid } from 'uuid';
 
-// import User from '../../models/User';
+import appDatasource from '../../../db/app-datasource';
 import { components } from '../../../types/api';
 import { ConflictError } from '../../errors';
-import appDatasource from '../../../db/app-datasource';
 import { Repository } from 'typeorm';
 import { AccountsRepository, UsersRepository } from '../../repositories';
 
@@ -33,7 +32,7 @@ export default class CreateAccounts {
     const account = {
       id: uuid(),
       name: this.data.name,
-      description: this.data.description
+      description: this.data.description,
     };
     await this.accountsRepository.insert(account);
     const user = {
