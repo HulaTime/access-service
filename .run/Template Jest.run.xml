@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="true" type="JavaScriptTestRunnerJest">
+    <node-interpreter value="$USER_HOME$/.n/versions/bin/node" />
+    <node-options value="" />
+    <working-dir value="" />
+    <envs />
+    <scope-kind value="ALL" />
+    <method v="2" />
+  </configuration>
+</component>

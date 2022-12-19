@@ -1,0 +1,60 @@
+import request from 'supertest';
+import { Like } from 'typeorm';
+import { v4 as uuid } from 'uuid';
+
+import app from '../../src/app';
+import testDatasource from '../test-datasource';
+import AccountsRepository from '../../src/repositories/AccountsRepository';
+import UsersRepository from '../../src/repositories/UsersRepository';
+import appDatasource from '../../db/app-datasource';
+
+jest.mock('uuid', () => ({
+  v4: jest.fn()
+}));
+
+const STUB_UUID_RESPONSE = '1923ccee-d63b-46bd-84fb-edf65936a6d7';
+
+
+describe('POST /accounts/:accountId/users', () => {
+  beforeAll(async () => {
+    (uuid as jest.Mock).mockReturnValue(STUB_UUID_RESPONSE);
+    await testDatasource.initialize();
+  });
+
+  afterEach(async () => {
+    const usersRepository = testDatasource.getRepository(UsersRepository);
+    await usersRepository.delete({ email: Like('%test%') });
+
+    const accountsRepository = testDatasource.getRepository(AccountsRepository);
+    await accountsRepository.delete({ name: Like('%test%') });
+  });
+
+  afterAll(async () => {
+    await appDatasource.destroy();
+    await testDatasource.destroy();
+  });
+
+  test('I can create a new user without specifying an account to associate them with', async () => {
+    const inputData = {
+      email: 'dingleberry@tests.co.uk',
+      password: 'training',
+    };
+    const { body } = await request(app)
+      .post('/access/users')
+      .send(inputData)
+      .expect(201);
+    const { password, ...inputDataMinusPassword } = inputData;
+    expect(body)
+      .toEqual({
+        ...inputDataMinusPassword,
+        id: STUB_UUID_RESPONSE,
+      });
+    const usersRepository = testDatasource.getRepository(UsersRepository);
+    const user = await usersRepository.findOneBy({ email: inputData.email });
+    expect(user)
+      .toMatchObject({ ...inputDataMinusPassword, id: STUB_UUID_RESPONSE });
+    expect(user?.password)
+      .not
+      .toEqual(password);
+  });
+});

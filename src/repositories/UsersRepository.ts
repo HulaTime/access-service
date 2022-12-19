@@ -7,16 +7,16 @@ export default class Users {
   @PrimaryColumn({ nullable: false })
   id!: string;
 
-  @ManyToOne(() => AccountsRepository, { nullable: false })
-  @JoinColumn()
-  account!: AccountsRepository;
-
   @Column({ unique: true, nullable: false })
   email!: string;
+
+  @Column({ nullable: false })
+  password!: string;
 
   @Column({ nullable: true })
   username?: string;
 
-  @Column({ nullable: false })
-  password!: string;
+  @ManyToOne(() => AccountsRepository, { nullable: true })
+  @JoinColumn()
+  account?: AccountsRepository;
 }

@@ -11,6 +11,10 @@ export interface paths {
   "/accounts/{id}": {
     get: operations["GetAccount"];
   };
+  "/users": {
+    /** Create a new Account by supplying basic information */
+    post: operations["CreateUser"];
+  };
 }
 
 export interface components {
@@ -64,6 +68,41 @@ export interface components {
       /** @description An optional short description of the account */
       description?: string;
     };
+    UserRequest: {
+      /**
+       * @description The email address of the user being created
+       * @example john@smith.co.uk
+       */
+      email: string;
+      /** @description The password of the user being created */
+      password: string;
+      /**
+       * @description The optional username of the user being created
+       * @example JohnDoe89
+       */
+      username?: string;
+      /** @description An optional short description of the account */
+      accountId?: string;
+    };
+    UserResponse: {
+      /**
+       * Format: uuid
+       * @description A generated unique identifier for the user
+       */
+      id: string;
+      /**
+       * @description The email address of the user being created
+       * @example john@smith.co.uk
+       */
+      email: string;
+      /**
+       * @description The optional username of the user being created
+       * @example JohnDoe89
+       */
+      username?: string;
+      /** @description An optional short description of the account */
+      accountId?: string;
+    };
   };
 }
 
@@ -97,6 +136,22 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["AccountResponse"];
         };
+      };
+    };
+  };
+  /** Create a new Account by supplying basic information */
+  CreateUser: {
+    responses: {
+      /** Successful creation of an account */
+      201: {
+        content: {
+          "application/json": components["schemas"]["UserResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserRequest"];
       };
     };
   };

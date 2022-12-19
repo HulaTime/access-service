@@ -21,6 +21,7 @@ app.use(OpenApiValidator.middleware({
 }));
 
 app.use(`/${serviceName}/accounts`, routers.accounts);
+app.use(`/${serviceName}/users`, routers.users);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorMiddleware: ErrorRequestHandler = (err, _req, res, _next) => {

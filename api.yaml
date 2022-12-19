@@ -47,6 +47,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccountResponse'
 
+  /users:
+    post:
+      operationId: CreateUser
+      tags:
+        - users
+      summary: Create a new Account user
+      description: Create a new Account by supplying basic information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        201:
+          description: Successful creation of an account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
 components:
   schemas:
     AccountRequest:
@@ -118,3 +138,49 @@ components:
           maxLength: 200
           description: An optional short description of the account
 
+    UserRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: The email address of the user being created
+          example: john@smith.co.uk
+        password:
+          type: string
+          description: The password of the user being created
+        username:
+          type: string
+          description: The optional username of the user being created
+          example: JohnDoe89
+        accountId:
+          type: string
+          maxLength: 200
+          description: An optional short description of the account
+
+    UserResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A generated unique identifier for the user
+        email:
+          type: string
+          description: The email address of the user being created
+          example: john@smith.co.uk
+        username:
+          type: string
+          description: The optional username of the user being created
+          example: JohnDoe89
+        accountId:
+          type: string
+          maxLength: 200
+          description: An optional short description of the account

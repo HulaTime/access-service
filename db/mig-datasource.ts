@@ -14,7 +14,7 @@ export const AccessDataSource = new DataSource({
   password: 'myspoke',
   database: 'myspoke',
   schema: 'access',
-  logging: true,
+  logging: false,
   entities: [Accounts, Users, Applications, Roles, Policies],
   subscribers: [],
   migrations: ['./db/migrations/*'],
