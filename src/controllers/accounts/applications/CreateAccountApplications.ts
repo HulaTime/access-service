@@ -8,13 +8,13 @@ import { Repository } from 'typeorm';
 import appDatasource from '../../../../db/app-datasource';
 import { components } from '../../../../types/api';
 import { AccessError } from '../../../errors';
-import { AccountsRepository, ApplicationsRepository } from '../../../repositories';
+import { AccountsEntity, ApplicationsEntity } from '../../../dbEntities';
 import AccountErrCodes from '../../../errors/errorCodes/accountErrorCodes';
 
 export default class CreateAccountApplications {
-  private readonly accountsRepository: Repository<AccountsRepository>;
+  private readonly accountsEntity: Repository<AccountsEntity>;
 
-  private readonly applicationsRepository: Repository<ApplicationsRepository>;
+  private readonly applicationsRepository: Repository<ApplicationsEntity>;
 
   private readonly accountId: string;
 
@@ -23,12 +23,12 @@ export default class CreateAccountApplications {
   constructor(accountId: string, data: components['schemas']['AccountAppRequest']) {
     this.accountId = accountId;
     this.data = data;
-    this.accountsRepository = appDatasource.getRepository(AccountsRepository);
-    this.applicationsRepository = appDatasource.getRepository(ApplicationsRepository);
+    this.accountsEntity = appDatasource.getRepository(AccountsEntity);
+    this.applicationsRepository = appDatasource.getRepository(ApplicationsEntity);
   }
 
   async exec(logger: Logger): Promise<components['schemas']['CreateAccountAppResponse']> {
-    const existingAccount = await this.accountsRepository.findOneBy({ id: this.accountId });
+    const existingAccount = await this.accountsEntity.findOneBy({ id: this.accountId });
     if (!existingAccount) {
       logger.info(`Account with id "${this.accountId}" does not exist`);
       throw new AccessError(AccountErrCodes.applicationAccountDoesNotExist);

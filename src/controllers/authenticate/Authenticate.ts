@@ -1,51 +1,39 @@
 import Logger from 'bunyan';
-import * as argon2 from 'argon2';
 import { sign as signJwt } from 'jsonwebtoken';
-import { Repository } from 'typeorm';
 
 import { components } from '../../../types/api';
-import appDatasource from '../../../db/app-datasource';
-import { ApplicationsRepository, UsersRepository } from '../../repositories';
+import { ApplicationsEntity, UsersEntity } from '../../dbEntities';
 import { AccessError } from '../../errors';
 import AuthenticateErrCodes from '../../errors/errorCodes/authenticateErrorCodes';
-
-type AuthenticateUserEmail = {
-  email: string;
-  password: string;
-}
+import AuthService from '../../services/AuthService';
+import datasource from '../../../db/app-datasource';
 
 type AuthenticateApp = components['schemas']['AuthenticateApp']
 
 const isAppAuthRequest = (data: components['schemas']['AuthenticateUser'] | components['schemas']['AuthenticateApp']):
   data is AuthenticateApp => !!(data as AuthenticateApp).clientId;
 
-const isUserEmailRequest = (data: components['schemas']['AuthenticateUser'] | components['schemas']['AuthenticateApp']):
-  data is AuthenticateUserEmail => !!(data as AuthenticateUserEmail).email;
-
 export default class Authenticate {
-  private readonly usersRepository: Repository<UsersRepository>;
-
-  private readonly applicationsRepository: Repository<ApplicationsRepository>;
-
   private readonly data: components['schemas']['AuthenticateUser'] | components['schemas']['AuthenticateApp'];
 
-  constructor(data: components['schemas']['AuthenticateUser'] | components['schemas']['AuthenticateApp']) {
+  constructor(
+    data: components['schemas']['AuthenticateUser'] | components['schemas']['AuthenticateApp'],
+  ) {
     this.data = data;
-    this.usersRepository = appDatasource.getRepository(UsersRepository);
-    this.applicationsRepository = appDatasource.getRepository(ApplicationsRepository);
   }
 
 
   async exec(logger: Logger): Promise<components['schemas']['AuthenticateRes']> {
+    const authService = new AuthService(
+      this.data, datasource.getRepository(ApplicationsEntity), datasource.getRepository(UsersEntity),
+    );
     if (isAppAuthRequest(this.data)) {
-      const { clientId, clientSecret } = this.data;
-      const application = await this.applicationsRepository.findOneBy({ clientId });
+      const application = await authService.getClientApplication();
       if (!application) {
         logger.error();
         throw new AccessError(AuthenticateErrCodes.applicationNotFound);
       }
-      const { clientSecret: clientSecretHash } = application;
-      const isValid = await argon2.verify(clientSecretHash, clientSecret);
+      const isValid = await authService.verifyCredentials();
       if (!isValid) {
         throw new Error('Forbidden');
       }
@@ -53,34 +41,16 @@ export default class Authenticate {
       return { accessToken };
     }
 
-    if (isUserEmailRequest(this.data)) {
-      const { email, password } = this.data;
-      const user = await this.usersRepository.findOneBy({ email });
-      if (!user) {
-        logger.error();
-        throw new AccessError(AuthenticateErrCodes.userNotFound);
-      }
-      const { password: passwordHash } = user;
-      const isValid = await argon2.verify(passwordHash, password);
-      if (!isValid) {
-        throw new Error('Forbidden');
-      }
-      const accessToken = signJwt({ sub: user.id }, 'abc123');
-      return { accessToken };
-    } else {
-      const { username, password } = this.data;
-      const user = await this.usersRepository.findOneBy({ username });
-      if (!user) {
-        logger.error();
-        throw new AccessError(AuthenticateErrCodes.userNotFound);
-      }
-      const { password: passwordHash } = user;
-      const isValid = await argon2.verify(passwordHash, password);
-      if (!isValid) {
-        throw new Error('Forbidden');
-      }
-      const accessToken = signJwt({ sub: user.id }, 'abc123');
-      return { accessToken };
+    const user = await authService.getUser();
+    if (!user) {
+      logger.error();
+      throw new AccessError(AuthenticateErrCodes.userNotFound);
     }
+    const isValid = await authService.verifyCredentials();
+    if (!isValid) {
+      throw new Error('Forbidden');
+    }
+    const accessToken = signJwt({ sub: user.id }, 'abc123');
+    return { accessToken };
   }
 }

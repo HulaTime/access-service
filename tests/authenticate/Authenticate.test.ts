@@ -6,7 +6,7 @@ import { decode } from 'jsonwebtoken';
 import app from '../../src/app';
 import testDatasource from '../test-datasource';
 import appDatasource from '../../db/app-datasource';
-import { AccountsRepository, ApplicationsRepository, UsersRepository } from '../../src/repositories';
+import { AccountsEntity, ApplicationsEntity, UsersEntity } from '../../src/dbEntities';
 
 const ACCOUNT_SEED_1 = {
   id: 'a1a54a0c-907d-4704-98fd-68dfb614f4a8',
@@ -17,7 +17,7 @@ const ACCOUNT_SEED_1 = {
 const CLIENT_ID = '01c3b4b0-d9ca-47d7-9427-f016f2741223';
 const CLIENT_SECRET = 'big secret';
 
-const APPLICATION_SEED_1: Omit<ApplicationsRepository, 'clientSecret'> = {
+const APPLICATION_SEED_1: Omit<ApplicationsEntity, 'clientSecret'> = {
   id: '21865c17-e882-423b-b0e6-e4b86bc83544',
   account: { id: ACCOUNT_SEED_1.id, name: ACCOUNT_SEED_1.name },
   name: 'application 1 test',
@@ -28,7 +28,7 @@ const APPLICATION_SEED_1: Omit<ApplicationsRepository, 'clientSecret'> = {
 const USER_1_EMAIL_ADDRESS = 'john@doe.com';
 const USER_1_USERNAME = 'johndoe';
 const USER_1_PW = 'clams';
-const USER_SEED_1: Omit<UsersRepository, 'password'> = {
+const USER_SEED_1: Omit<UsersEntity, 'password'> = {
   id: 'da4aca43-f880-4739-93e6-396497170cb5',
   email: USER_1_EMAIL_ADDRESS,
   username: USER_1_USERNAME,
@@ -37,15 +37,15 @@ const USER_SEED_1: Omit<UsersRepository, 'password'> = {
 describe('POST /authenticate', () => {
   beforeAll(async () => {
     await testDatasource.initialize();
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    await accountsRepository.insert(ACCOUNT_SEED_1);
-    const applicationsRepository = testDatasource.getRepository(ApplicationsRepository);
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    await accountsEntity.insert(ACCOUNT_SEED_1);
+    const applicationsRepository = testDatasource.getRepository(ApplicationsEntity);
     await applicationsRepository.insert({
       ...APPLICATION_SEED_1,
       clientSecret: await argon2.hash(CLIENT_SECRET),
     });
 
-    const usersRepository = testDatasource.getRepository(UsersRepository);
+    const usersRepository = testDatasource.getRepository(UsersEntity);
     await usersRepository.insert({
       ...USER_SEED_1,
       password: await argon2.hash(USER_1_PW),
@@ -53,13 +53,13 @@ describe('POST /authenticate', () => {
   });
 
   afterAll(async () => {
-    const applicationRepository = testDatasource.getRepository(ApplicationsRepository);
+    const applicationRepository = testDatasource.getRepository(ApplicationsEntity);
     await applicationRepository.delete({ description: Like('%test%') });
 
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    await accountsRepository.delete({ name: Like('%test%') });
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    await accountsEntity.delete({ name: Like('%test%') });
 
-    const usersRepository = testDatasource.getRepository(UsersRepository);
+    const usersRepository = testDatasource.getRepository(UsersEntity);
     await usersRepository.delete({ id: USER_SEED_1.id });
 
     await appDatasource.destroy();

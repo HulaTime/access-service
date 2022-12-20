@@ -1,16 +1,16 @@
 import {
-  Column, Entity, PrimaryColumn, OneToOne, JoinColumn, 
+  Column, Entity, PrimaryColumn, OneToOne, JoinColumn,
 } from 'typeorm';
 
-import AccountsRepository from './AccountsRepository';
-import RolesRepository from './RolesRepository';
+import AccountsEntity from './AccountsEntity';
+import RolesRepository from './RolesEntity';
 
 @Entity()
 export default class Policies {
   @PrimaryColumn({ nullable: false })
   id!: string;
 
-  @OneToOne(() => AccountsRepository, { nullable: false })
+  @OneToOne(() => AccountsEntity, { nullable: false })
   @JoinColumn()
   account!: string;
 

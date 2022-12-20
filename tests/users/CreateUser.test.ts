@@ -4,13 +4,11 @@ import { v4 as uuid } from 'uuid';
 
 import app from '../../src/app';
 import testDatasource from '../test-datasource';
-import AccountsRepository from '../../src/repositories/AccountsRepository';
-import UsersRepository from '../../src/repositories/UsersRepository';
+import AccountsEntity from '../../src/dbEntities/AccountsEntity';
+import UsersRepository from '../../src/dbEntities/UsersEntity';
 import appDatasource from '../../db/app-datasource';
 
-jest.mock('uuid', () => ({
-  v4: jest.fn()
-}));
+jest.mock('uuid', () => ({ v4: jest.fn() }));
 
 const STUB_UUID_RESPONSE = '1923ccee-d63b-46bd-84fb-edf65936a6d7';
 
@@ -25,8 +23,8 @@ describe('POST /accounts/:accountId/users', () => {
     const usersRepository = testDatasource.getRepository(UsersRepository);
     await usersRepository.delete({ email: Like('%test%') });
 
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    await accountsRepository.delete({ name: Like('%test%') });
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    await accountsEntity.delete({ name: Like('%test%') });
   });
 
   afterAll(async () => {

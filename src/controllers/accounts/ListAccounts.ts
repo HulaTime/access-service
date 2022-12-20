@@ -2,7 +2,7 @@ import Logger from 'bunyan';
 import { DataSource } from 'typeorm';
 
 import appDatasource from '../../../db/app-datasource';
-import { AccountsRepository } from '../../repositories';
+import { AccountsEntity } from '../../dbEntities';
 import { components } from '../../../types/api';
 
 export default class ListAccounts {
@@ -13,7 +13,7 @@ export default class ListAccounts {
   }
 
   async exec(logger: Logger): Promise<components['schemas']['AccountResponse'][] > {
-    const accounts = await this.dataSource.getRepository(AccountsRepository).find();
+    const accounts = await this.dataSource.getRepository(AccountsEntity).find();
     logger.info('Success');
     return accounts;
   }

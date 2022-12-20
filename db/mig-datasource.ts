@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 
-import Accounts from '../src/repositories/AccountsRepository';
-import Users from '../src/repositories/UsersRepository';
-import Applications from '../src/repositories/ApplicationsRepository';
-import Roles from '../src/repositories/RolesRepository';
-import Policies from '../src/repositories/PoliciesRepository';
+import Accounts from '../src/dbEntities/AccountsEntity';
+import Users from '../src/dbEntities/UsersEntity';
+import Applications from '../src/dbEntities/ApplicationsEntity';
+import Roles from '../src/dbEntities/RolesEntity';
+import Policies from '../src/dbEntities/PoliciesEntity';
 
 export const AccessDataSource = new DataSource({
   type: 'postgres',
@@ -18,6 +18,6 @@ export const AccessDataSource = new DataSource({
   entities: [Accounts, Users, Applications, Roles, Policies],
   subscribers: [],
   migrations: ['./db/migrations/*'],
-  migrationsTableName: 'access_migrations'
+  migrationsTableName: 'access_migrations',
 });
 

@@ -7,17 +7,17 @@ import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
 import appDatasource from '../../../db/app-datasource';
 import { AccessError } from '../../errors';
 import { components } from '../../../types/api';
-import { UsersRepository } from '../../repositories';
+import { UsersEntity } from '../../dbEntities';
 
 export default class CreateAccounts {
-  private readonly usersRepository: Repository<UsersRepository>;
+  private readonly usersRepository: Repository<UsersEntity>;
 
   private readonly data: components['schemas']['UserRequest'];
 
 
   constructor(data: components['schemas']['UserRequest']) {
     this.data = data;
-    this.usersRepository = appDatasource.getRepository(UsersRepository);
+    this.usersRepository = appDatasource.getRepository(UsersEntity);
   }
 
   async exec(logger: Logger): Promise<components['schemas']['UserResponse']> {

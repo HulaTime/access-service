@@ -7,20 +7,20 @@ import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
 import appDatasource from '../../../db/app-datasource';
 import { components } from '../../../types/api';
 import { AccessError } from '../../errors';
-import { AccountsRepository, UsersRepository } from '../../repositories';
+import { AccountsEntity, UsersEntity } from '../../dbEntities';
 
 export default class CreateAccounts {
-  private readonly accountsRepository: Repository<AccountsRepository>;
+  private readonly accountsEntity: Repository<AccountsEntity>;
 
-  private readonly usersRepository: Repository<UsersRepository>;
+  private readonly usersRepository: Repository<UsersEntity>;
 
   private readonly data: components['schemas']['AccountRequest'];
 
 
   constructor(data: components['schemas']['AccountRequest']) {
     this.data = data;
-    this.accountsRepository = appDatasource.getRepository(AccountsRepository);
-    this.usersRepository = appDatasource.getRepository(UsersRepository);
+    this.accountsEntity = appDatasource.getRepository(AccountsEntity);
+    this.usersRepository = appDatasource.getRepository(UsersEntity);
   }
 
   async exec(logger: Logger): Promise<components['schemas']['CreateAccountResponse']> {
@@ -35,7 +35,7 @@ export default class CreateAccounts {
       name: this.data.name,
       description: this.data.description,
     };
-    await this.accountsRepository.insert(account);
+    await this.accountsEntity.insert(account);
     const user = {
       id: uuid(),
       email: this.data.email,

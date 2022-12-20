@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
 
-import Account from '../src/repositories/AccountsRepository';
-import Users from '../src/repositories/UsersRepository';
-import Applications from '../src/repositories/ApplicationsRepository';
-import Roles from '../src/repositories/RolesRepository';
+import Account from '../src/dbEntities/AccountsEntity';
+import Users from '../src/dbEntities/UsersEntity';
+import Applications from '../src/dbEntities/ApplicationsEntity';
+import Roles from '../src/dbEntities/RolesEntity';
 
 export default new DataSource({
   type: 'postgres',

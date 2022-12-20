@@ -2,7 +2,7 @@ import Logger from 'bunyan';
 import { DataSource } from 'typeorm';
 
 import appDatasource from '../../../db/app-datasource';
-import { AccountsRepository } from '../../repositories';
+import { AccountsEntity } from '../../dbEntities';
 import { components } from '../../../types/api';
 import { AccessError } from '../../errors';
 import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
@@ -18,7 +18,7 @@ export default class GetAccount {
   }
 
   async exec(logger: Logger): Promise<components['schemas']['AccountResponse'] > {
-    const account = await this.dataSource.getRepository(AccountsRepository).findOneBy({ id: this.id });
+    const account = await this.dataSource.getRepository(AccountsEntity).findOneBy({ id: this.id });
     if (!account) {
       throw new AccessError(AccountErrCodes.requestedAccountDoesNotExist);
     }

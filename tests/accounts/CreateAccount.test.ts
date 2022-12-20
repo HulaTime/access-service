@@ -4,8 +4,8 @@ import { v4 as uuid } from 'uuid';
 
 import app from '../../src/app';
 import testDatasource from '../test-datasource';
-import AccountsRepository from '../../src/repositories/AccountsRepository';
-import UsersRepository from '../../src/repositories/UsersRepository';
+import AccountsEntity from '../../src/dbEntities/AccountsEntity';
+import UsersRepository from '../../src/dbEntities/UsersEntity';
 import appDatasource from '../../db/app-datasource';
 
 jest.mock('uuid', () => ({ v4: jest.fn() }));
@@ -22,8 +22,8 @@ describe('POST /accounts', () => {
     const usersRepository = testDatasource.getRepository(UsersRepository);
     await usersRepository.delete({ email: Like('%test%') });
 
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    await accountsRepository.delete({ name: Like('%test%') });
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    await accountsEntity.delete({ name: Like('%test%') });
   });
 
   afterAll(async () => {
@@ -50,8 +50,8 @@ describe('POST /accounts', () => {
       });
     expect(body.id)
       .toBeDefined();
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    const createdAccount = await accountsRepository.findOneBy({ name: 'test-account' });
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    const createdAccount = await accountsEntity.findOneBy({ name: 'test-account' });
     expect(createdAccount)
       .toMatchObject({ name: inputData.name, description: inputData.description });
     expect(createdAccount?.id)
@@ -116,8 +116,8 @@ describe('POST /accounts', () => {
       .send(inputData)
       .expect(409);
     expect(body).toEqual({ message: 'An account already exists for email address provided' });
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    const accounts = await accountsRepository.findBy({ name: 'test-account' });
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    const accounts = await accountsEntity.findBy({ name: 'test-account' });
     expect(accounts).toHaveLength(1);
     const usersRepository = testDatasource.getRepository(UsersRepository);
     const users = await usersRepository.findBy({ email: inputData.email });

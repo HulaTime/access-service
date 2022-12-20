@@ -3,26 +3,26 @@ import request from 'supertest';
 import app from '../../src/app';
 import testDatasource from '../test-datasource';
 import appDatasource from '../../db/app-datasource';
-import { AccountsRepository } from '../../src/repositories';
+import { AccountsEntity } from '../../src/dbEntities';
 
 const ACCOUNT_1_ID = '60226823-ccbc-4d46-beb9-96a60d90d564';
 
 const ACCOUNT_1 = {
   id: ACCOUNT_1_ID,
   name: 'test account one',
-  description: 'a test account'
+  description: 'a test account',
 };
 
 describe('GET /accounts/:id', () => {
   beforeAll(async () => {
     await testDatasource.initialize();
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    await accountsRepository.insert(ACCOUNT_1);
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    await accountsEntity.insert(ACCOUNT_1);
   });
 
   afterAll(async () => {
-    const accountsRepository = testDatasource.getRepository(AccountsRepository);
-    await accountsRepository.delete({ id: ACCOUNT_1_ID });
+    const accountsEntity = testDatasource.getRepository(AccountsEntity);
+    await accountsEntity.delete({ id: ACCOUNT_1_ID });
     await appDatasource.destroy();
     await testDatasource.destroy();
   });
