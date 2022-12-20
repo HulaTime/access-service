@@ -1,11 +1,12 @@
 import Logger from 'bunyan';
 import * as argon2 from 'argon2';
 import { v4 as uuid } from 'uuid';
-
-import { components } from '../../../types/api';
-import { ConflictError } from '../../errors';
-import appDatasource from '../../../db/app-datasource';
 import { Repository } from 'typeorm';
+
+import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
+import appDatasource from '../../../db/app-datasource';
+import { AccessError } from '../../errors';
+import { components } from '../../../types/api';
 import { UsersRepository } from '../../repositories';
 
 export default class CreateAccounts {
@@ -23,7 +24,7 @@ export default class CreateAccounts {
     const existingUser = await this.usersRepository.findOneBy({ email: this.data.email });
     if (existingUser) {
       logger.info(`User ${this.data.email} already has an account`);
-      throw new ConflictError(`User ${this.data.email} already has an account`);
+      throw new AccessError(AccountErrCodes.userAlreadyHasAccount);
     }
 
     const user = {

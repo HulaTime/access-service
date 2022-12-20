@@ -1,15 +1,15 @@
-import qs from 'qs';
 import bodyParser from 'body-parser';
 import express, { Express, ErrorRequestHandler } from 'express';
 import * as OpenApiValidator from 'express-openapi-validator';
+import { parse as parseQs } from 'qs';
 
-import { queryStringDepth, serviceName } from './config';
 import routers from './routers';
-import { ConflictError } from './errors';
+import { queryStringDepth, serviceName } from './config';
+import httpErrorMapper from './errors/httpErrorMapper';
 
 const app: Express = express();
 
-app.set('query parser', (value: string) => qs.parse(value, { depth: queryStringDepth }));
+app.set('query parser', (value: string) => parseQs(value, { depth: queryStringDepth }));
 
 app.use(bodyParser.json({}));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,16 +26,10 @@ app.use(`/${serviceName}/authenticate`, routers.authenticate);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorMiddleware: ErrorRequestHandler = (err, _req, res, _next) => {
-  if (err instanceof ConflictError) {
-    return res.status(409)
-      .json({ message: err.message });
-  }
+  const httpError = httpErrorMapper(err);
 
-  return res.status(err.status || 500)
-    .json({
-      message: err.message,
-      errors: err.errors,
-    });
+  return res.status(httpError.statusCode)
+    .json({ message: httpError.message, errors: httpError.errors });
 };
 
 app.use(errorMiddleware);

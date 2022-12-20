@@ -8,9 +8,7 @@ import AccountsRepository from '../../src/repositories/AccountsRepository';
 import UsersRepository from '../../src/repositories/UsersRepository';
 import appDatasource from '../../db/app-datasource';
 
-jest.mock('uuid', () => ({
-  v4: jest.fn()
-}));
+jest.mock('uuid', () => ({ v4: jest.fn() }));
 
 const STUB_UUID_RESPONSE = '1923ccee-d63b-46bd-84fb-edf65936a6d7';
 
@@ -38,7 +36,7 @@ describe('POST /accounts', () => {
       name: 'test-account',
       email: 'dingleberry@tests.co.uk',
       password: 'training',
-      description: 'this is a test account'
+      description: 'this is a test account',
     };
     const { body } = await request(app)
       .post('/access/accounts')
@@ -69,9 +67,7 @@ describe('POST /accounts', () => {
   });
 
   test('I cannot create an account with an invalid payload', async () => {
-    const badInputData = {
-      foo: 'bar',
-    };
+    const badInputData = { foo: 'bar' };
     const { body } = await request(app)
       .post('/access/accounts')
       .send(badInputData)
@@ -109,7 +105,7 @@ describe('POST /accounts', () => {
       name: 'test-account',
       email: 'dingleberry@tests.co.uk',
       password: 'training',
-      description: 'this is a test account'
+      description: 'this is a test account',
     };
     await request(app)
       .post('/access/accounts')
@@ -119,9 +115,7 @@ describe('POST /accounts', () => {
       .post('/access/accounts')
       .send(inputData)
       .expect(409);
-    expect(body).toEqual({
-      message: `User ${inputData.email} already has an account`
-    });
+    expect(body).toEqual({ message: 'An account already exists for email address provided' });
     const accountsRepository = testDatasource.getRepository(AccountsRepository);
     const accounts = await accountsRepository.findBy({ name: 'test-account' });
     expect(accounts).toHaveLength(1);

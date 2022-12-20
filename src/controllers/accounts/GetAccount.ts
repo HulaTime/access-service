@@ -4,7 +4,8 @@ import { DataSource } from 'typeorm';
 import appDatasource from '../../../db/app-datasource';
 import { AccountsRepository } from '../../repositories';
 import { components } from '../../../types/api';
-import { ResourceNotFoundError } from '../../errors';
+import { AccessError } from '../../errors';
+import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
 
 export default class GetAccount {
   private readonly id: string;
@@ -19,7 +20,7 @@ export default class GetAccount {
   async exec(logger: Logger): Promise<components['schemas']['AccountResponse'] > {
     const account = await this.dataSource.getRepository(AccountsRepository).findOneBy({ id: this.id });
     if (!account) {
-      throw new ResourceNotFoundError('d');
+      throw new AccessError(AccountErrCodes.requestedAccountDoesNotExist);
     }
     logger.info('Success');
     return account;

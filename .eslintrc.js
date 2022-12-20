@@ -1,3 +1,1 @@
-module.exports = {
-  extends: ['eslint-config-sensible-style'],
-};
+module.exports = { extends: ['eslint-config-sensible-style'] };

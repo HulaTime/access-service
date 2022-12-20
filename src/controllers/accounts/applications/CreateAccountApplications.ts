@@ -1,13 +1,15 @@
+import * as crypto from 'crypto';
+
 import Logger from 'bunyan';
 import * as argon2 from 'argon2';
-import * as crypto from 'crypto';
 import { v4 as uuid } from 'uuid';
+import { Repository } from 'typeorm';
 
 import appDatasource from '../../../../db/app-datasource';
 import { components } from '../../../../types/api';
-import { ConflictError } from '../../../errors';
-import { Repository } from 'typeorm';
+import { AccessError } from '../../../errors';
 import { AccountsRepository, ApplicationsRepository } from '../../../repositories';
+import AccountErrCodes from '../../../errors/errorCodes/accountErrorCodes';
 
 export default class CreateAccountApplications {
   private readonly accountsRepository: Repository<AccountsRepository>;
@@ -29,7 +31,7 @@ export default class CreateAccountApplications {
     const existingAccount = await this.accountsRepository.findOneBy({ id: this.accountId });
     if (!existingAccount) {
       logger.info(`Account with id "${this.accountId}" does not exist`);
-      throw new ConflictError(`Account with id "${this.accountId}" does not exist`);
+      throw new AccessError(AccountErrCodes.applicationAccountDoesNotExist);
     }
     const clientSecret: string = crypto
       .createHash('sha256')

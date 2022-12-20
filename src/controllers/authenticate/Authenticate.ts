@@ -1,12 +1,13 @@
 import Logger from 'bunyan';
-import jwt from 'jsonwebtoken';
 import * as argon2 from 'argon2';
+import { sign as signJwt } from 'jsonwebtoken';
+import { Repository } from 'typeorm';
 
 import { components } from '../../../types/api';
-import { ConflictError } from '../../errors';
 import appDatasource from '../../../db/app-datasource';
-import { Repository } from 'typeorm';
 import { ApplicationsRepository, UsersRepository } from '../../repositories';
+import { AccessError } from '../../errors';
+import AuthenticateErrCodes from '../../errors/errorCodes/authenticateErrorCodes';
 
 type AuthenticateUserEmail = {
   email: string;
@@ -41,14 +42,14 @@ export default class Authenticate {
       const application = await this.applicationsRepository.findOneBy({ clientId });
       if (!application) {
         logger.error();
-        throw new ConflictError('app doesn\'t exist');
+        throw new AccessError(AuthenticateErrCodes.applicationNotFound);
       }
       const { clientSecret: clientSecretHash } = application;
       const isValid = await argon2.verify(clientSecretHash, clientSecret);
       if (!isValid) {
         throw new Error('Forbidden');
       }
-      const accessToken = jwt.sign({ sub: application.id }, 'abc123');
+      const accessToken = signJwt({ sub: application.id }, 'abc123');
       return { accessToken };
     }
 
@@ -57,28 +58,28 @@ export default class Authenticate {
       const user = await this.usersRepository.findOneBy({ email });
       if (!user) {
         logger.error();
-        throw new ConflictError('user doesn\'t exist');
+        throw new AccessError(AuthenticateErrCodes.userNotFound);
       }
       const { password: passwordHash } = user;
       const isValid = await argon2.verify(password, passwordHash);
       if (!isValid) {
         throw new Error('Forbidden');
       }
-      const accessToken = jwt.sign({ sub: user.id }, 'abc123');
+      const accessToken = signJwt({ sub: user.id }, 'abc123');
       return { accessToken };
     } else {
       const { username, password } = this.data;
       const user = await this.usersRepository.findOneBy({ username });
       if (!user) {
         logger.error();
-        throw new ConflictError('user doesn\'t exist');
+        throw new AccessError(AuthenticateErrCodes.userNotFound);
       }
       const { password: passwordHash } = user;
       const isValid = await argon2.verify(password, passwordHash);
       if (!isValid) {
         throw new Error('Forbidden');
       }
-      const accessToken = jwt.sign({ sub: user.id }, 'abc123');
+      const accessToken = signJwt({ sub: user.id }, 'abc123');
       return { accessToken };
     }
   }

@@ -1,9 +1,8 @@
 import { Router } from 'express';
-
 import { createLogger } from 'bunyan';
+import { serializeError } from 'serialize-error';
 
 import controllers from '../controllers/accounts';
-import { serializeError } from 'serialize-error';
 import { components, operations } from '../../types/api';
 
 const router: Router = Router();
