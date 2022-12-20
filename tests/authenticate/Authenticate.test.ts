@@ -1,11 +1,12 @@
 import request from 'supertest';
 import * as argon2 from 'argon2';
 import { Like } from 'typeorm';
+import { decode } from 'jsonwebtoken';
 
 import app from '../../src/app';
 import testDatasource from '../test-datasource';
 import appDatasource from '../../db/app-datasource';
-import { AccountsRepository, ApplicationsRepository } from '../../src/repositories';
+import { AccountsRepository, ApplicationsRepository, UsersRepository } from '../../src/repositories';
 
 const ACCOUNT_SEED_1 = {
   id: 'a1a54a0c-907d-4704-98fd-68dfb614f4a8',
@@ -16,12 +17,21 @@ const ACCOUNT_SEED_1 = {
 const CLIENT_ID = '01c3b4b0-d9ca-47d7-9427-f016f2741223';
 const CLIENT_SECRET = 'big secret';
 
-const APPLICATION_SEED_1 = {
+const APPLICATION_SEED_1: Omit<ApplicationsRepository, 'clientSecret'> = {
   id: '21865c17-e882-423b-b0e6-e4b86bc83544',
-  account: { id: ACCOUNT_SEED_1.id },
+  account: { id: ACCOUNT_SEED_1.id, name: ACCOUNT_SEED_1.name },
   name: 'application 1 test',
   clientId: CLIENT_ID,
   description: 'test',
+};
+
+const USER_1_EMAIL_ADDRESS = 'john@doe.com';
+const USER_1_USERNAME = 'johndoe';
+const USER_1_PW = 'clams';
+const USER_SEED_1: Omit<UsersRepository, 'password'> = {
+  id: 'da4aca43-f880-4739-93e6-396497170cb5',
+  email: USER_1_EMAIL_ADDRESS,
+  username: USER_1_USERNAME,
 };
 
 describe('POST /authenticate', () => {
@@ -34,6 +44,12 @@ describe('POST /authenticate', () => {
       ...APPLICATION_SEED_1,
       clientSecret: await argon2.hash(CLIENT_SECRET),
     });
+
+    const usersRepository = testDatasource.getRepository(UsersRepository);
+    await usersRepository.insert({
+      ...USER_SEED_1,
+      password: await argon2.hash(USER_1_PW),
+    });
   });
 
   afterAll(async () => {
@@ -42,6 +58,9 @@ describe('POST /authenticate', () => {
 
     const accountsRepository = testDatasource.getRepository(AccountsRepository);
     await accountsRepository.delete({ name: Like('%test%') });
+
+    const usersRepository = testDatasource.getRepository(UsersRepository);
+    await usersRepository.delete({ id: USER_SEED_1.id });
 
     await appDatasource.destroy();
     await testDatasource.destroy();
@@ -57,7 +76,39 @@ describe('POST /authenticate', () => {
         .post('/access/authenticate')
         .send(inputData)
         .expect(200);
-      expect(body.accessToken).toBeDefined();
+      const { accessToken } = body;
+      expect(accessToken).toBeDefined();
+      expect(decode(accessToken)?.sub).toEqual(APPLICATION_SEED_1.id);
+    });
+  });
+
+  describe('Users', () => {
+    test('I can exchange email and password for an access token', async () => {
+      const inputData = {
+        email: USER_1_EMAIL_ADDRESS,
+        password: USER_1_PW,
+      };
+      const { body } = await request(app)
+        .post('/access/authenticate')
+        .send(inputData)
+        .expect(200);
+      const { accessToken } = body;
+      expect(accessToken).toBeDefined();
+      expect(decode(accessToken)?.sub).toEqual(USER_SEED_1.id);
+    });
+
+    test('I can exchange username and password for an access token', async () => {
+      const inputData = {
+        username: USER_1_USERNAME,
+        password: USER_1_PW,
+      };
+      const { body } = await request(app)
+        .post('/access/authenticate')
+        .send(inputData)
+        .expect(200);
+      const { accessToken } = body;
+      expect(accessToken).toBeDefined();
+      expect(decode(accessToken)?.sub).toEqual(USER_SEED_1.id);
     });
   });
 });

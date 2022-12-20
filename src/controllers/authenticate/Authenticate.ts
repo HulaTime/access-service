@@ -61,7 +61,7 @@ export default class Authenticate {
         throw new AccessError(AuthenticateErrCodes.userNotFound);
       }
       const { password: passwordHash } = user;
-      const isValid = await argon2.verify(password, passwordHash);
+      const isValid = await argon2.verify(passwordHash, password);
       if (!isValid) {
         throw new Error('Forbidden');
       }
@@ -75,7 +75,7 @@ export default class Authenticate {
         throw new AccessError(AuthenticateErrCodes.userNotFound);
       }
       const { password: passwordHash } = user;
-      const isValid = await argon2.verify(password, passwordHash);
+      const isValid = await argon2.verify(passwordHash, password);
       if (!isValid) {
         throw new Error('Forbidden');
       }
