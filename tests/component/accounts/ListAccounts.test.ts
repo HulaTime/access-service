@@ -5,6 +5,7 @@ import appDatasource from '../../../db/app-datasource';
 import { AccountsEntity } from '../../../src/dbEntities';
 import Account from '../../../src/models/Account';
 import app from '../../../src/app';
+import AccessToken from '../../../src/lib/AccessToken';
 
 const ACCOUNT_1 = new Account({
   id: 'b5e60f80-4eee-4e26-9b50-f3565a6e39dd',
@@ -37,6 +38,7 @@ describe('ListAccounts', () => {
   test('I can list all the accounts', async () => {
     const { body } = await request(app)
       .get('/access/accounts')
+      .set('authorization', new AccessToken().output())
       .send()
       .expect(200);
     expect(body).toHaveLength(2);

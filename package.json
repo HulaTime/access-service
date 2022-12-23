@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc && cp api.yaml dist",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts'",
     "test": "node_modules/.bin/jest --detectOpenHandles --collectCoverage",
     "npm-check": "npm-check -u",
     "prestart": "npm run build",

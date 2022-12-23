@@ -7,6 +7,7 @@ import testDatasource from '../../test-datasource';
 import AccountsEntity from '../../../src/dbEntities/AccountsEntity';
 import UsersRepository from '../../../src/dbEntities/UsersEntity';
 import appDatasource from '../../../db/app-datasource';
+import AccessToken from '../../../src/lib/AccessToken';
 
 jest.mock('uuid', () => ({ v4: jest.fn() }));
 
@@ -39,6 +40,7 @@ describe('POST /accounts/:accountId/users', () => {
     };
     const { body } = await request(app)
       .post('/access/users')
+      .set('authorization', new AccessToken().output())
       .send(inputData)
       .expect(201);
     const { password, ...inputDataMinusPassword } = inputData;

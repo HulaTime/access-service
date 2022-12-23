@@ -3,6 +3,7 @@ import request from 'supertest';
 import app from '../../../src/app';
 import testDatasource from '../../test-datasource';
 import appDatasource from '../../../db/app-datasource';
+import AccessToken from '../../../src/lib/AccessToken';
 import { AccountsEntity } from '../../../src/dbEntities';
 
 const ACCOUNT_1_ID = '60226823-ccbc-4d46-beb9-96a60d90d564';
@@ -30,6 +31,7 @@ describe('GET /accounts/:id', () => {
   test('I can get an account by id', async () => {
     const { body } = await request(app)
       .get(`/access/accounts/${ACCOUNT_1_ID}`)
+      .set('authorization', new AccessToken().output())
       .send()
       .expect(200);
     expect(body)

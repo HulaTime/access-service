@@ -1,11 +1,12 @@
 import bodyParser from 'body-parser';
-import * as OpenApiValidator from 'express-openapi-validator';
 import { parse as parseQs } from 'qs';
-import express, { Express, ErrorRequestHandler } from 'express';
+import express, { Express } from 'express';
 
 import routers from './routers';
+import authMiddleware from './middlewares/authMiddleware';
+import errorMiddleware from './middlewares/errorMiddleware';
+import validationMiddleware from './middlewares/validationMiddleware';
 import { queryStringDepth, serviceName } from './config';
-import httpErrorMapper from './errors/httpErrorMapper';
 
 const app: Express = express();
 
@@ -14,23 +15,14 @@ app.set('query parser', (value: string) => parseQs(value, { depth: queryStringDe
 app.use(bodyParser.json({}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(OpenApiValidator.middleware({
-  apiSpec: `${__dirname}/../api.yaml`,
-  validateRequests: true,
-  validateResponses: false,
-}));
+app.use(validationMiddleware);
+
+app.use(`/${serviceName}/authenticate`, routers.authenticate);
+
+app.use(authMiddleware);
 
 app.use(`/${serviceName}/accounts`, routers.accounts);
 app.use(`/${serviceName}/users`, routers.users);
-app.use(`/${serviceName}/authenticate`, routers.authenticate);
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const errorMiddleware: ErrorRequestHandler = (err, _req, res, _next) => {
-  const httpError = httpErrorMapper(err);
-
-  return res.status(httpError.statusCode)
-    .json({ message: httpError.message, errors: httpError.errors });
-};
 
 app.use(errorMiddleware);
 

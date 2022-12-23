@@ -5,6 +5,7 @@ import testDatasource from '../../../test-datasource';
 import appDatasource from '../../../../db/app-datasource';
 import { AccountsEntity, ApplicationsEntity } from '../../../../src/dbEntities';
 import { components } from '../../../../types/api';
+import AccessToken from '../../../../src/lib/AccessToken';
 
 const ACCOUNT_1_ID = '60226823-ccbc-4d46-beb9-96a60d90d564';
 
@@ -45,6 +46,7 @@ describe('POST /accounts/:id/applications', () => {
     };
     const { body } = await request(app)
       .post(`/access/accounts/${ACCOUNT_1_ID}/applications`)
+      .set('authorization', new AccessToken().output())
       .send(accountAppReqData)
       .expect(201);
     expect(body).toMatchObject(accountAppReqData);
