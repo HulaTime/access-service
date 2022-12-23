@@ -4,6 +4,9 @@ import { serializeError } from 'serialize-error';
 
 import controllers from '../controllers/accounts';
 import { components, operations } from '../../types/api';
+import { areNullValuesSupported } from '../../config/app.config';
+
+import { stripNullResponseValues } from './index';
 
 const router: Router = Router();
 
@@ -17,14 +20,39 @@ router.post<Record<never, never>,
     try {
       const { body } = req;
       const controller = new controllers.CreateAccounts(body);
-      const result = await controller.exec(logger);
-      return res.status(201)
-        .json(result);
+      const { account, user } = await controller.exec(logger);
+      return res
+        .status(201)
+        .json(stripNullResponseValues({
+          id: account.id,
+          name: account.name,
+          description: account.description,
+          email: user.email,
+        }, areNullValuesSupported));
     } catch (err) {
       logger.error({ error: serializeError(err) }, 'Failed');
       return next(err);
     }
   });
+
+router.get<
+  Record<never, never>,
+  components['schemas']['ListAccountResponse'],
+  Record<never, never>,
+  Record<never, never>,
+  Record<never, never>
+>('/', async (_, res, next) => {
+  try {
+    const controller = new controllers.ListAccounts();
+    const accounts = await controller.exec(logger);
+    return res
+      .status(200)
+      .json(stripNullResponseValues(accounts, areNullValuesSupported));
+  } catch (err) {
+    logger.error({ error: serializeError(err) }, 'Failed');
+    return next(err);
+  }
+});
 
 router.get<
   operations['GetAccount']['parameters']['path'],
@@ -36,7 +64,9 @@ router.get<
   try {
     const controller = new controllers.GetAccount(req.params.id);
     const account = await controller.exec(logger);
-    return res.status(200).json(account);
+    return res
+      .status(200)
+      .json(stripNullResponseValues(account, areNullValuesSupported));
   } catch (err) {
     logger.error({ error: serializeError(err) }, 'Failed');
     return next(err);
@@ -54,7 +84,9 @@ router.post<
     const { body, params: { id: accountId } } = req;
     const controller = new controllers.CreateAccountApplications(accountId, body);
     const accountApp = await controller.exec(logger);
-    return res.status(201).json(accountApp);
+    return res
+      .status(201)
+      .json(stripNullResponseValues(accountApp, areNullValuesSupported));
   } catch (err) {
     logger.error({ error: serializeError(err) }, 'Failed');
     return next(err);

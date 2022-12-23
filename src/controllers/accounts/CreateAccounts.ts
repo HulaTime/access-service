@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 
 import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
 import appDatasource from '../../../db/app-datasource';
+import Account from '../../models/Account';
+import User from '../../models/User';
 import { components } from '../../../types/api';
 import { AccessError } from '../../errors';
 import { AccountsEntity, UsersEntity } from '../../dbEntities';
@@ -22,31 +24,25 @@ export default class CreateAccounts {
     this.usersRepository = appDatasource.getRepository(UsersEntity);
   }
 
-  async exec(logger: Logger): Promise<components['schemas']['CreateAccountResponse']> {
+  async exec(logger: Logger): Promise<{ account: Account; user: User }> {
     const existingUser = await this.usersRepository.findOneBy({ email: this.data.email });
     if (existingUser) {
       logger.info(`User ${this.data.email} already has an account`);
       throw new AccessError(AccountErrCodes.userAlreadyHasAccount);
     }
 
-    const account = {
+    const account = new Account({
       id: uuid(),
       name: this.data.name,
       description: this.data.description,
-    };
+    });
     await this.accountsEntity.insert(account);
-    const user = {
+    const user = new User({
       id: uuid(),
       email: this.data.email,
       password: await argon2.hash(this.data.password),
-      account: { id: account.id },
-    };
+    }, account);
     await this.usersRepository.insert(user);
-    return {
-      id: account.id,
-      name: account.name,
-      description: account.description,
-      email: user.email,
-    };
+    return { account, user };
   }
 }

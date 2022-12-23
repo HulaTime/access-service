@@ -1,18 +1,23 @@
 import { v4 as uuid } from 'uuid';
 
+import Account from './Account';
+
 export type UserData = {
-  id?: string;
+  id: string;
   email: string;
+  password: string;
   username?: string;
-  name?: string;
   description?: string;
 }
 
 export interface IUser {
   id: string;
   email: string;
+  password: string;
+
+  account: Account;
   username?: string;
-  name?: string;
+  description?: string;
 }
 
 export default class User implements IUser {
@@ -21,14 +26,20 @@ export default class User implements IUser {
 
   email: string;
 
+  password: string;
+
+  account: Account;
+
   username?: string;
 
-  name?: string;
+  description?: string;
 
-
-  constructor(data: UserData) {
+  constructor(data: UserData, account: Account) {
     this.id = data.id || uuid();
     this.email = data.email;
-    this.name = data.name;
+    this.password = data.password;
+    this.username = data.username;
+    this.description = data.description;
+    this.account = account;
   }
 }

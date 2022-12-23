@@ -25,6 +25,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateAccountResponse'
+    get:
+      operationId: ListAccounts
+      tags:
+        - accounts
+      summary: List all accounts you have access to
+      description: Create a new Account by supplying basic information
+      responses:
+        201:
+          description: Successful creation of an account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAccountResponse'
 
   /accounts/{id}:
     get:
@@ -186,6 +199,11 @@ components:
           type: string
           maxLength: 200
           description: An optional short description of the account
+
+    ListAccountResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountResponse'
 
     UserRequest:
       type: object

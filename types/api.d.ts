@@ -6,6 +6,8 @@
 export interface paths {
   "/accounts": {
     /** Create a new Account by supplying basic information */
+    get: operations["ListAccounts"];
+    /** Create a new Account by supplying basic information */
     post: operations["CreateAccount"];
   };
   "/accounts/{id}": {
@@ -76,6 +78,7 @@ export interface components {
       /** @description An optional short description of the account */
       description?: string;
     };
+    ListAccountResponse: components["schemas"]["AccountResponse"][];
     UserRequest: {
       /**
        * @description The email address of the user being created
@@ -160,6 +163,17 @@ export interface components {
 }
 
 export interface operations {
+  /** Create a new Account by supplying basic information */
+  ListAccounts: {
+    responses: {
+      /** Successful creation of an account */
+      201: {
+        content: {
+          "application/json": components["schemas"]["ListAccountResponse"];
+        };
+      };
+    };
+  };
   /** Create a new Account by supplying basic information */
   CreateAccount: {
     responses: {

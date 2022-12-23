@@ -3,7 +3,8 @@ import { DataSource } from 'typeorm';
 
 import appDatasource from '../../../db/app-datasource';
 import { AccountsEntity } from '../../dbEntities';
-import { ResourceNotFoundError } from '../../errors';
+import { AccessError } from '../../errors';
+import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
 
 export default class DeleteAccount {
   private readonly id: string;
@@ -18,7 +19,7 @@ export default class DeleteAccount {
   async exec(logger: Logger): Promise<void> {
     const account = await this.dataSource.getRepository(AccountsEntity).delete({ id: this.id });
     if (!account) {
-      throw new ResourceNotFoundError('d');
+      throw new AccessError(AccountErrCodes.accountDoesNotExist);
     }
     logger.info('Success');
   }
