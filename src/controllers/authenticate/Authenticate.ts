@@ -1,12 +1,12 @@
 import Logger from 'bunyan';
-import { sign as signJwt } from 'jsonwebtoken';
 
+import datasource from '../../../db/app-datasource';
+import AuthService from '../../services/AuthService';
+import AccessToken from '../../lib/AccessToken';
+import AuthenticateErrCodes from '../../errors/errorCodes/authenticateErrorCodes';
 import { components } from '../../../types/api';
 import { ApplicationsEntity, UsersEntity } from '../../dbEntities';
 import { AccessError } from '../../errors';
-import AuthenticateErrCodes from '../../errors/errorCodes/authenticateErrorCodes';
-import AuthService from '../../services/AuthService';
-import datasource from '../../../db/app-datasource';
 
 type AuthenticateApp = components['schemas']['AuthenticateApp']
 
@@ -23,7 +23,7 @@ export default class Authenticate {
   }
 
 
-  async exec(logger: Logger): Promise<components['schemas']['AuthenticateRes']> {
+  async exec(logger: Logger): Promise<AccessToken> {
     const authService = new AuthService(
       this.data, datasource.getRepository(ApplicationsEntity), datasource.getRepository(UsersEntity),
     );
@@ -37,8 +37,7 @@ export default class Authenticate {
       if (!isValid) {
         throw new Error('Forbidden');
       }
-      const accessToken = signJwt({ sub: application.id }, 'abc123');
-      return { accessToken };
+      return new AccessToken({ sub: application.id });
     }
 
     const user = await authService.getUser();
@@ -50,7 +49,6 @@ export default class Authenticate {
     if (!isValid) {
       throw new Error('Forbidden');
     }
-    const accessToken = signJwt({ sub: user.id }, 'abc123');
-    return { accessToken };
+    return new AccessToken({ sub: user.id });
   }
 }

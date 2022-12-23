@@ -19,9 +19,10 @@ router.post<
   try {
     const { body } = req;
     const controller = new controllers.Authenticate(body);
-    const result = await controller.exec(logger);
-    return res.status(200)
-      .json(result);
+    const token = await controller.exec(logger);
+    return res
+      .status(200)
+      .json({ accessToken: token.output() });
   } catch (err) {
     logger.error({ error: serializeError(err) }, 'Failed');
     return next(err);
