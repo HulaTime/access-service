@@ -2,11 +2,11 @@ import request from 'supertest';
 import { Like } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
-import app from '../../src/app';
-import testDatasource from '../test-datasource';
-import AccountsEntity from '../../src/dbEntities/AccountsEntity';
-import UsersRepository from '../../src/dbEntities/UsersEntity';
-import appDatasource from '../../db/app-datasource';
+import app from '../../../src/app';
+import testDatasource from '../../test-datasource';
+import AccountsEntity from '../../../src/dbEntities/AccountsEntity';
+import UsersRepository from '../../../src/dbEntities/UsersEntity';
+import appDatasource from '../../../db/app-datasource';
 
 jest.mock('uuid', () => ({ v4: jest.fn() }));
 

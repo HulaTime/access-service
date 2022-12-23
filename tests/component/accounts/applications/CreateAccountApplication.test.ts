@@ -1,10 +1,10 @@
 import request from 'supertest';
 
-import app from '../../../src/app';
-import testDatasource from '../../test-datasource';
-import appDatasource from '../../../db/app-datasource';
-import { AccountsEntity, ApplicationsEntity } from '../../../src/dbEntities';
-import { components } from '../../../types/api';
+import app from '../../../../src/app';
+import testDatasource from '../../../test-datasource';
+import appDatasource from '../../../../db/app-datasource';
+import { AccountsEntity, ApplicationsEntity } from '../../../../src/dbEntities';
+import { components } from '../../../../types/api';
 
 const ACCOUNT_1_ID = '60226823-ccbc-4d46-beb9-96a60d90d564';
 

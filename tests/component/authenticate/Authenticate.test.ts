@@ -3,10 +3,10 @@ import * as argon2 from 'argon2';
 import { Like } from 'typeorm';
 import { decode } from 'jsonwebtoken';
 
-import app from '../../src/app';
-import testDatasource from '../test-datasource';
-import appDatasource from '../../db/app-datasource';
-import { AccountsEntity, ApplicationsEntity, UsersEntity } from '../../src/dbEntities';
+import app from '../../../src/app';
+import testDatasource from '../../test-datasource';
+import appDatasource from '../../../db/app-datasource';
+import { AccountsEntity, ApplicationsEntity, UsersEntity } from '../../../src/dbEntities';
 
 const ACCOUNT_SEED_1 = {
   id: 'a1a54a0c-907d-4704-98fd-68dfb614f4a8',

@@ -1,3 +1,7 @@
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 const required = (varName: string): string => {
   const variable = process.env[varName];
   if (!variable) {
@@ -6,4 +10,8 @@ const required = (varName: string): string => {
   return variable;
 };
 
-export const authTokenSecret = required('AUTH_TOKEN_SECRET');
+export const accessTokenPrivateKey = required('ACCESS_TOKEN_PRIVATE_KEY');
+
+export const accessTokenPassphrase = required('ACCESS_TOKEN_KEY_PASSPHRASE');
+
+export const accessTokenPublicKey = required('ACCESS_TOKEN_PUBLIC_KEY');

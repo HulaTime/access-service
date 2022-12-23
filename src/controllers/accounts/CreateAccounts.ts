@@ -16,7 +16,6 @@ export default class CreateAccounts {
 
   private readonly data: components['schemas']['AccountRequest'];
 
-
   constructor(data: components['schemas']['AccountRequest']) {
     this.data = data;
     this.accountsEntity = appDatasource.getRepository(AccountsEntity);

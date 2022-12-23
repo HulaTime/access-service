@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
-import express, { Express, ErrorRequestHandler } from 'express';
 import * as OpenApiValidator from 'express-openapi-validator';
 import { parse as parseQs } from 'qs';
+import express, { Express, ErrorRequestHandler } from 'express';
 
 import routers from './routers';
 import { queryStringDepth, serviceName } from './config';

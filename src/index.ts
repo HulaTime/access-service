@@ -1,10 +1,12 @@
 import 'reflect-metadata';
+import * as http from 'http';
+
 import { serializeError } from 'serialize-error';
 import { createLogger } from 'bunyan';
 
-import app from './app';
 import datasource from '../db/app-datasource';
-import * as http from 'http';
+
+import app from './app';
 
 const port = 3000;
 
