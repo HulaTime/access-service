@@ -46,7 +46,7 @@ describe('POST /accounts/:id/applications', () => {
     };
     const { body } = await request(app)
       .post(`/access/accounts/${ACCOUNT_1_ID}/applications`)
-      .set('authorization', new AccessToken().output())
+      .set('authorization', new AccessToken().sign())
       .send(accountAppReqData)
       .expect(201);
     expect(body).toMatchObject(accountAppReqData);

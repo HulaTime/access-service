@@ -41,7 +41,7 @@ describe('POST /accounts', () => {
     };
     const { body } = await request(app)
       .post('/access/accounts')
-      .set('authorization', new AccessToken().output())
+      .set('authorization', new AccessToken().sign())
       .send(inputData)
       .expect(201);
     const { password, ...inputDataMinusPassword } = inputData;
@@ -72,7 +72,7 @@ describe('POST /accounts', () => {
     const badInputData = { foo: 'bar' };
     const { body } = await request(app)
       .post('/access/accounts')
-      .set('authorization', new AccessToken().output())
+      .set('authorization', new AccessToken().sign())
       .send(badInputData)
       .expect(400);
     expect(body)
@@ -112,12 +112,12 @@ describe('POST /accounts', () => {
     };
     await request(app)
       .post('/access/accounts')
-      .set('authorization', new AccessToken().output())
+      .set('authorization', new AccessToken().sign())
       .send(inputData)
       .expect(201);
     const { body } = await request(app)
       .post('/access/accounts')
-      .set('authorization', new AccessToken().output())
+      .set('authorization', new AccessToken().sign())
       .send(inputData)
       .expect(409);
     expect(body).toEqual({ message: 'An account already exists for email address provided' });

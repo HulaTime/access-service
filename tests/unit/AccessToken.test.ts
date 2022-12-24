@@ -4,6 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import AccessToken from '../../src/lib/AccessToken';
 import { AccessError } from '../../src/errors';
 import AccessTokenErrCodes from '../../src/errors/errorCodes/accessTokenErrCodes';
+import KeyPair from '../../src/lib/KeyPair';
 
 describe('AccessToken class', () => {
   test('It should exist', () => {
@@ -12,12 +13,12 @@ describe('AccessToken class', () => {
 
   it('A new access token is generated and accessible on the instantiated class', () =>{
     const accessToken = new AccessToken();
-    expect(accessToken.output()).toBeDefined();
+    expect(accessToken.sign()).toBeDefined();
   });
 
   it('A new access token is generated and should be a string', () =>{
     const accessToken = new AccessToken();
-    expect(typeof accessToken.output()).toEqual('string');
+    expect(typeof accessToken.sign()).toEqual('string');
   });
 
   it('A new access token can be instantiated with custom claims', () => {
@@ -25,12 +26,46 @@ describe('AccessToken class', () => {
       foo: 'bar',
       hello: 'world',
     });
-    expect(accessToken.output()).toBeDefined();
+    expect(accessToken.sign()).toBeDefined();
+  });
+
+  it('A new access token can be signed with override keys', () => {
+    const accessToken = new AccessToken({
+      foo: 'bar',
+      hello: 'world',
+    });
+    const keyPair = new KeyPair('passphrase');
+    const signedToken = accessToken.sign({
+      privateKey: keyPair.privateKey,
+      passphrase: 'passphrase',
+    });
+    expect(signedToken).toBeDefined();
+    jwt.verify(
+      signedToken,
+      keyPair.publicKey,
+      { algorithms: ['ES512'] },
+    );
+  });
+
+  it('A new access token can be verified with overridden keys', () => {
+    const customClaims = { foo: 'bar', hello: 'world' };
+    const accessToken = new AccessToken(customClaims);
+    const keyPair = new KeyPair('passphrase');
+    const signedToken = accessToken.sign({
+      privateKey: keyPair.privateKey,
+      passphrase: 'passphrase',
+    });
+    expect(signedToken).toBeDefined();
+    const result = AccessToken.verify(signedToken, keyPair.publicKey);
+    expect(result).toEqual({
+      ...customClaims,
+      iat: expect.any(Number),
+    });
   });
 
   it('A new access token can be verified', () => {
     const accessToken = new AccessToken();
-    const verifyResult = AccessToken.verify(accessToken.output());
+    const verifyResult = AccessToken.verify(accessToken.sign());
     expect(verifyResult).toMatchObject({});
     expect(verifyResult.iat).toEqual(expect.any(Number));
   });

@@ -11,16 +11,13 @@ export default class AccessToken {
     this._claims = { ...claims };
   }
 
-  output(): string {
-    return jwt.sign(this._claims, {
-      key: accessTokenPrivateKey,
-      passphrase: accessTokenPassphrase,
-    }, { algorithm: 'ES512' });
-  }
-
-  static verify(token: string): jwt.JwtPayload {
+  static verify(token: string, overridePublicKey?: string): jwt.JwtPayload {
     try {
-      const result = jwt.verify(token, accessTokenPublicKey, { algorithms: ['ES512'] });
+      const result = jwt.verify(
+        token,
+        overridePublicKey ?? accessTokenPublicKey,
+        { algorithms: ['ES512'] },
+      );
       if (typeof result === 'string') {
         throw new AccessError(AccessTokenErrCodes.invalidTokenPayload);
       }
@@ -31,5 +28,12 @@ export default class AccessToken {
       }
       throw new AccessError(AccessTokenErrCodes.invalidAccessToken);
     }
+  }
+
+  sign(overrideKeys?: { privateKey: string; passphrase: string }): string {
+    return jwt.sign(this._claims, {
+      key: overrideKeys?.privateKey ?? accessTokenPrivateKey,
+      passphrase: overrideKeys?.passphrase ?? accessTokenPassphrase,
+    }, { algorithm: 'ES512' });
   }
 }

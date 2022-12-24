@@ -40,7 +40,7 @@ describe('POST /accounts/:accountId/users', () => {
     };
     const { body } = await request(app)
       .post('/access/users')
-      .set('authorization', new AccessToken().output())
+      .set('authorization', new AccessToken().sign())
       .send(inputData)
       .expect(201);
     const { password, ...inputDataMinusPassword } = inputData;

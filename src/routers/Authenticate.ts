@@ -22,7 +22,7 @@ router.post<
     const token = await controller.exec(logger);
     return res
       .status(200)
-      .json({ accessToken: token.output() });
+      .json({ accessToken: token.sign() });
   } catch (err) {
     logger.error({ error: serializeError(err) }, 'Failed');
     return next(err);
