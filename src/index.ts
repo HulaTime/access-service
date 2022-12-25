@@ -5,10 +5,9 @@ import { serializeError } from 'serialize-error';
 import { createLogger } from 'bunyan';
 
 import datasource from '../db/app-datasource';
+import { port } from '../config/server.config';
 
 import app from './app';
-
-const port = 3000;
 
 const logger = createLogger({ name: 'access startup logger' });
 

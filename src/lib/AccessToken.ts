@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+import { v4 as uuid } from 'uuid';
 
 import { accessTokenPassphrase, accessTokenPrivateKey, accessTokenPublicKey } from '../../config/app.config';
 import { AccessError } from '../errors';
@@ -34,6 +35,6 @@ export default class AccessToken {
     return jwt.sign(this._claims, {
       key: overrideKeys?.privateKey ?? accessTokenPrivateKey,
       passphrase: overrideKeys?.passphrase ?? accessTokenPassphrase,
-    }, { algorithm: 'ES512' });
+    }, { algorithm: 'ES512', header: { kid: uuid(), alg: 'ES512' } });
   }
 }
