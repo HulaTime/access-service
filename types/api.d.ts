@@ -35,13 +35,6 @@ export interface components {
        * @example Johns Place
        */
       name: string;
-      /**
-       * @description The email address of the account owner
-       * @example john@smith.co.uk
-       */
-      email: string;
-      /** @description The user password of the account owner */
-      password: string;
       /** @description An optional short description of the account */
       description?: string;
     };
@@ -56,11 +49,6 @@ export interface components {
        * @example Johns Place
        */
       name: string;
-      /**
-       * @description The email address of the account owner
-       * @example john@smith.co.uk
-       */
-      email: string;
       /** @description An optional short description of the account */
       description?: string;
     };
@@ -176,6 +164,11 @@ export interface operations {
   };
   /** Create a new Account by supplying basic information */
   CreateAccount: {
+    parameters: {
+      header: {
+        authorization?: string;
+      };
+    };
     responses: {
       /** Successful creation of an account */
       201: {

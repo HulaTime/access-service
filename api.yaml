@@ -13,6 +13,12 @@ paths:
         - accounts
       summary: Create a new Account
       description: Create a new Account by supplying basic information
+      parameters:
+        - name: authorization
+          in: header
+          required: false
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -136,20 +142,11 @@ components:
       additionalProperties: false
       required:
         - name
-        - email
-        - password
       properties:
         name:
           type: string
           description: The name of the account
           example: Johns Place
-        email:
-          type: string
-          description: The email address of the account owner
-          example: john@smith.co.uk
-        password:
-          type: string
-          description: The user password of the account owner
         description:
           type: string
           maxLength: 200
@@ -161,7 +158,6 @@ components:
       required:
         - id
         - name
-        - email
       properties:
         id:
           type: string
@@ -171,10 +167,6 @@ components:
           type: string
           description: The name of the account
           example: Johns Place
-        email:
-          type: string
-          description: The email address of the account owner
-          example: john@smith.co.uk
         description:
           type: string
           maxLength: 200

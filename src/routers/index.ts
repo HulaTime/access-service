@@ -1,3 +1,5 @@
+import { JwtPayload } from 'jsonwebtoken';
+
 import accounts from './Accounts';
 import users from './Users';
 import authenticate from './Authenticate';
@@ -28,6 +30,10 @@ export function stripNullResponseValues
   const reducer = noNullReducer(response);
   const responseKeys: Array<keyof T> = Object.keys(response);
   return responseKeys.reduce(reducer, {} as T);
+}
+
+export type ResLocals = {
+  authClaims: JwtPayload;
 }
 
 export default {

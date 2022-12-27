@@ -8,15 +8,28 @@ import AccountsEntity from '../../../src/dbEntities/AccountsEntity';
 import UsersRepository from '../../../src/dbEntities/UsersEntity';
 import appDatasource from '../../../db/app-datasource';
 import AccessToken from '../../../src/lib/AccessToken';
+import { UsersEntity } from '../../../src/dbEntities';
 
 jest.mock('uuid', () => ({ v4: jest.fn() }));
 
 const STUB_UUID_RESPONSE = '1923ccee-d63b-46bd-84fb-edf65936a6d7';
 
+const USER_SEED_1: UsersEntity = {
+  id: 'e3e30945-b1e4-4d81-87e3-36983f582258',
+  username: 'mr bojangles',
+  email: 'bobo@test.com',
+  password: 'dfsafalskljfsla',
+};
+
 describe('POST /accounts', () => {
   beforeAll(async () => {
     (uuid as jest.Mock).mockReturnValue(STUB_UUID_RESPONSE);
     await testDatasource.initialize();
+  });
+
+  beforeEach(async() => {
+    const usersRepository = testDatasource.getRepository(UsersRepository);
+    await usersRepository.insert(USER_SEED_1);
   });
 
   afterEach(async () => {
@@ -32,100 +45,90 @@ describe('POST /accounts', () => {
     await testDatasource.destroy();
   });
 
-  test('I can create a new account, with an associated user', async () => {
-    const inputData = {
+  describe('Obtained valid user token', () => {
+    const userAccessToken = new AccessToken('user',{ sub: USER_SEED_1.id });
+
+    const createAccountReqData = {
       name: 'test-account',
-      email: 'dingleberry@tests.co.uk',
-      password: 'training',
       description: 'this is a test account',
     };
-    const { body } = await request(app)
-      .post('/access/accounts')
-      .set('authorization', new AccessToken().sign())
-      .send(inputData)
-      .expect(201);
-    const { password, ...inputDataMinusPassword } = inputData;
-    expect(body)
-      .toEqual({
-        ...inputDataMinusPassword,
+
+    test('I can create a new account', async () => {
+      const { body } = await request(app)
+        .post('/access/accounts')
+        .set('authorization', userAccessToken.sign())
+        .send(createAccountReqData)
+        .expect(201);
+      expect(body)
+        .toEqual({
+          ...createAccountReqData,
+          id: STUB_UUID_RESPONSE,
+        });
+      const accountsEntity = testDatasource.getRepository(AccountsEntity);
+      const createdAccount = await accountsEntity.findOneBy({ name: 'test-account' });
+      expect(createdAccount).toMatchObject({
+        ...createAccountReqData,
         id: STUB_UUID_RESPONSE,
       });
-    expect(body.id)
-      .toBeDefined();
-    const accountsEntity = testDatasource.getRepository(AccountsEntity);
-    const createdAccount = await accountsEntity.findOneBy({ name: 'test-account' });
-    expect(createdAccount)
-      .toMatchObject({ name: inputData.name, description: inputData.description });
-    expect(createdAccount?.id)
-      .toBeDefined();
+    });
 
-    const usersRepository = testDatasource.getRepository(UsersRepository);
-    const user = await usersRepository.findOneBy({ email: inputData.email });
-    expect(user)
-      .toBeDefined();
-    expect(user?.password)
-      .not
-      .toEqual(password);
-  });
-
-  test('I cannot create an account with an invalid payload', async () => {
-    const badInputData = { foo: 'bar' };
-    const { body } = await request(app)
-      .post('/access/accounts')
-      .set('authorization', new AccessToken().sign())
-      .send(badInputData)
-      .expect(400);
-    expect(body)
-      .toEqual({
-        errors: [
-          {
-            errorCode: 'additionalProperties.openapi.validation',
-            message: 'should NOT have additional properties',
-            path: '.body.foo',
-          },
-          {
-            errorCode: 'required.openapi.validation',
-            message: 'should have required property \'name\'',
-            path: '.body.name',
-          },
-          {
-            errorCode: 'required.openapi.validation',
-            message: 'should have required property \'email\'',
-            path: '.body.email',
-          },
-          {
-            errorCode: 'required.openapi.validation',
-            message: 'should have required property \'password\'',
-            path: '.body.password',
-          },
-        ],
-        message: 'request.body should NOT have additional properties, request.body should have required property \'name\', request.body should have required property \'email\', request.body should have required property \'password\'',
+    test('The new account should be associated with the user who created it', async () => {
+      const { body } = await request(app)
+        .post('/access/accounts')
+        .set('authorization', userAccessToken.sign())
+        .send(createAccountReqData)
+        .expect(201);
+      expect(body)
+        .toEqual({
+          ...createAccountReqData,
+          id: STUB_UUID_RESPONSE,
+        });
+      const userEntity = testDatasource.getRepository(UsersEntity);
+      const [user] = await userEntity.find({
+        where: { id: USER_SEED_1.id },
+        relations: { account: true },
       });
+      expect(user?.account).toEqual(body);
+    });
   });
 
-  test('I cannot create more than one account with the same email', async () => {
-    const inputData = {
-      name: 'test-account',
-      email: 'dingleberry@tests.co.uk',
-      password: 'training',
-      description: 'this is a test account',
-    };
-    await request(app)
-      .post('/access/accounts')
-      .set('authorization', new AccessToken().sign())
-      .send(inputData)
-      .expect(201);
-    const { body } = await request(app)
-      .post('/access/accounts')
-      .set('authorization', new AccessToken().sign())
-      .send(inputData)
-      .expect(409);
-    expect(body).toEqual({ message: 'An account already exists for email address provided' });
-    const accountsEntity = testDatasource.getRepository(AccountsEntity);
-    const accounts = await accountsEntity.findBy({ name: 'test-account' });
-    expect(accounts).toHaveLength(1);
-    const usersRepository = testDatasource.getRepository(UsersRepository);
-    const users = await usersRepository.findBy({ email: inputData.email });
-    expect(users).toHaveLength(1);
+  describe('Failure scenarios', () => {
+    test('I cannot create an account without an authorization token', async () => {
+      const inputData = {
+        name: 'test-account',
+        description: 'this is a test account',
+      };
+      const { body } = await request(app)
+        .post('/access/accounts')
+        .send(inputData)
+        .expect(401);
+      expect(body)
+        .toEqual({  message: 'No authorization header provided' });
+    });
+
+    test('I cannot create an account with an invalid payload', async () => {
+      const badInputData = { foo: 'bar' };
+      const { body } = await request(app)
+        .post('/access/accounts')
+        .set('authorization', new AccessToken('user').sign())
+        .send(badInputData)
+        .expect(400);
+      expect(body)
+        .toEqual({
+          errors: [
+            {
+              errorCode: 'additionalProperties.openapi.validation',
+              message: 'should NOT have additional properties',
+              path: '.body.foo',
+            },
+            {
+              errorCode: 'required.openapi.validation',
+              message: 'should have required property \'name\'',
+              path: '.body.name',
+            },
+          ],
+          message: 'request.body should NOT have additional properties, request.body should have required property \'name\'',
+        });
+    });
   });
 });

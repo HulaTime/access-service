@@ -37,7 +37,7 @@ export default class Authenticate {
       if (!isValid) {
         throw new Error('Forbidden');
       }
-      return new AccessToken({ sub: application.id });
+      return new AccessToken('application', { sub: application.id });
     }
 
     const user = await authService.getUser();
@@ -49,6 +49,6 @@ export default class Authenticate {
     if (!isValid) {
       throw new Error('Forbidden');
     }
-    return new AccessToken({ sub: user.id });
+    return new AccessToken('user',{ sub: user.id });
   }
 }

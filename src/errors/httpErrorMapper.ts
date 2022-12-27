@@ -3,6 +3,7 @@ import { BadRequest as OpenApiErrorBadReq } from 'express-openapi-validator/dist
 import AccountErrCodes from './errorCodes/accountErrorCodes';
 import AccessTokenErrCodes from './errorCodes/accessTokenErrCodes';
 import AuthenticateErrCodes from './errorCodes/authenticateErrorCodes';
+import UserErrCodes from './errorCodes/userErrorCodes';
 
 import { AccessError } from './index';
 
@@ -12,7 +13,10 @@ export type HttpFailure = {
   errors?: unknown[];
 }
 
-const unexpectedErrorResponse = { statusCode: 500, message: 'Something unexpected has happened, a team is investigating what went wrong' };
+const unexpectedErrorResponse = (msg?: string): HttpFailure => ({
+  statusCode: 500,
+  message: msg ?? 'Something unexpected has happened, a team is investigating what went wrong',
+});
 
 const conflictResponse = (message?: string): HttpFailure => ({ statusCode: 409, message });
 
@@ -27,19 +31,24 @@ const httpErrorMapper = (err: unknown): HttpFailure => {
   }
 
   if (!(err instanceof AccessError)) {
-    return unexpectedErrorResponse;
+    return unexpectedErrorResponse();
   }
 
   switch (err.errorCode) {
-    case AccountErrCodes.userAlreadyHasAccount: {
-      return conflictResponse('An account already exists for email address provided');
+    case AuthenticateErrCodes.noAuthHeader: {
+      return unauthorizedResponse('No authorization header provided');
     }
-    case AuthenticateErrCodes.noAuthHeader:
     case AccessTokenErrCodes.invalidAccessToken: {
       return unauthorizedResponse('The supplied accessToken is not valid');
     }
+    case AccountErrCodes.userDoesNotExist: {
+      return unexpectedErrorResponse('An account already exists for email address provided');
+    }
+    case UserErrCodes.userAlreadyHasAccount: {
+      return conflictResponse('A user with the supplied email address already exists');
+    }
     default: {
-      return unexpectedErrorResponse;
+      return unexpectedErrorResponse();
     }
   }
 };

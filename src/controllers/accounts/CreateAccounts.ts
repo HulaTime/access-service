@@ -1,7 +1,7 @@
 import Logger from 'bunyan';
-import * as argon2 from 'argon2';
 import { v4 as uuid } from 'uuid';
 import { Repository } from 'typeorm';
+import { JwtPayload } from 'jsonwebtoken';
 
 import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
 import appDatasource from '../../../db/app-datasource';
@@ -18,17 +18,24 @@ export default class CreateAccounts {
 
   private readonly data: components['schemas']['AccountRequest'];
 
-  constructor(data: components['schemas']['AccountRequest']) {
+  private readonly authClaims: JwtPayload;
+
+  constructor(data: components['schemas']['AccountRequest'], authClaims: JwtPayload) {
     this.data = data;
     this.accountsEntity = appDatasource.getRepository(AccountsEntity);
     this.usersRepository = appDatasource.getRepository(UsersEntity);
+    this.authClaims = authClaims;
   }
 
-  async exec(logger: Logger): Promise<{ account: Account; user: User }> {
-    const existingUser = await this.usersRepository.findOneBy({ email: this.data.email });
-    if (existingUser) {
-      logger.info(`User ${this.data.email} already has an account`);
-      throw new AccessError(AccountErrCodes.userAlreadyHasAccount);
+  async exec(logger: Logger): Promise< Account> {
+    const { sub: userId } = this.authClaims;
+    const existingUser = await this.usersRepository.findOneBy({ id: userId });
+    if (!existingUser) {
+      logger.info({
+        msg: `Could not find a user with id "${userId}"` ,
+        authClaims: this.authClaims,
+      });
+      throw new AccessError(AccountErrCodes.userDoesNotExist);
     }
 
     const account = new Account({
@@ -37,12 +44,11 @@ export default class CreateAccounts {
       description: this.data.description,
     });
     await this.accountsEntity.insert(account);
-    const user = new User({
-      id: uuid(),
-      email: this.data.email,
-      password: await argon2.hash(this.data.password),
-    }, account);
-    await this.usersRepository.insert(user);
-    return { account, user };
+    const user = new User(existingUser, account);
+    await this.usersRepository.update(
+      { id: existingUser.id },
+      user,
+    );
+    return account;
   }
 }

@@ -6,10 +6,13 @@ import { AccessError } from '../errors';
 import AccessTokenErrCodes from '../errors/errorCodes/accessTokenErrCodes';
 
 export default class AccessToken {
+  tokenType: 'application' | 'user'
+
   private _claims: Record<string, unknown> = {};
 
-  constructor(claims?: Record<string, unknown>) {
-    this._claims = { ...claims };
+  constructor(type: 'application' | 'user', claims?: Record<string, unknown>) {
+    this.tokenType = type;
+    this._claims = { ...claims, tokenType: type };
   }
 
   static verify(token: string, overridePublicKey?: string): jwt.JwtPayload {
