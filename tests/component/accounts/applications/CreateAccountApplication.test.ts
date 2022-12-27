@@ -39,14 +39,14 @@ describe('POST /accounts/:id/applications', () => {
     await testDatasource.destroy();
   });
 
-  test('I create a new application for an existing application', async () => {
+  test('I create a new application for an existing account', async () => {
     const accountAppReqData: components['schemas']['AccountAppRequest'] = {
       name: 'my new account',
       description: 'generic information',
     };
     const { body } = await request(app)
       .post(`/access/accounts/${ACCOUNT_1_ID}/applications`)
-      .set('authorization', new AccessToken().sign())
+      .set('authorization', new AccessToken('user').sign())
       .send(accountAppReqData)
       .expect(201);
     expect(body).toMatchObject(accountAppReqData);

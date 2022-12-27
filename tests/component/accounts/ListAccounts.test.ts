@@ -38,7 +38,7 @@ describe('ListAccounts', () => {
   test('I can list all the accounts', async () => {
     const { body } = await request(app)
       .get('/access/accounts')
-      .set('authorization', new AccessToken().sign())
+      .set('authorization', new AccessToken('user').sign())
       .send()
       .expect(200);
     expect(body).toHaveLength(2);

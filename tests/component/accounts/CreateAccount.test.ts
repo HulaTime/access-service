@@ -27,7 +27,7 @@ describe('POST /accounts', () => {
     await testDatasource.initialize();
   });
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     const usersRepository = testDatasource.getRepository(UsersRepository);
     await usersRepository.insert(USER_SEED_1);
   });
@@ -46,7 +46,7 @@ describe('POST /accounts', () => {
   });
 
   describe('Obtained valid user token', () => {
-    const userAccessToken = new AccessToken('user',{ sub: USER_SEED_1.id });
+    const userAccessToken = new AccessToken('user', { sub: USER_SEED_1.id });
 
     const createAccountReqData = {
       name: 'test-account',
@@ -103,7 +103,21 @@ describe('POST /accounts', () => {
         .send(inputData)
         .expect(401);
       expect(body)
-        .toEqual({  message: 'No authorization header provided' });
+        .toEqual({ message: 'No authorization header provided' });
+    });
+
+    test('I cannot create an account with a malformed authorization token', async () => {
+      const inputData = {
+        name: 'test-account',
+        description: 'this is a test account',
+      };
+      const { body } = await request(app)
+        .post('/access/accounts')
+        .set('authorization', 'imabadtoken')
+        .send(inputData)
+        .expect(401);
+      expect(body)
+        .toEqual({ message: 'The supplied accessToken is not valid' });
     });
 
     test('I cannot create an account with an invalid payload', async () => {
@@ -129,6 +143,25 @@ describe('POST /accounts', () => {
           ],
           message: 'request.body should NOT have additional properties, request.body should have required property \'name\'',
         });
+    });
+
+    test('A user can only have one account', async() => {
+      (uuid as jest.Mock).mockReturnValueOnce('3fb016d6-3988-4006-a303-706fa50e90d1');
+      (uuid as jest.Mock).mockReturnValueOnce('46007371-7119-4561-bc7d-4e60143ed38a');
+
+      const signedUserAccessToken = new AccessToken('user', { sub: USER_SEED_1.id }).sign();
+      const inputData = { name: 'test-account', description: 'this is a test account' };
+      await request(app)
+        .post('/access/accounts')
+        .set('authorization', signedUserAccessToken)
+        .send(inputData)
+        .expect(201);
+      const { body } = await request(app)
+        .post('/access/accounts')
+        .set('authorization', signedUserAccessToken)
+        .send(inputData)
+        .expect(409);
+      expect(body).toEqual({ message: 'User already has an account' });
     });
   });
 });

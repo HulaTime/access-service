@@ -31,7 +31,7 @@ describe('GET /accounts/:id', () => {
   test('I can get an account by id', async () => {
     const { body } = await request(app)
       .get(`/access/accounts/${ACCOUNT_1_ID}`)
-      .set('authorization', new AccessToken().sign())
+      .set('authorization', new AccessToken('user').sign())
       .send()
       .expect(200);
     expect(body)

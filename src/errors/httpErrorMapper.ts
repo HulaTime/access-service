@@ -47,6 +47,9 @@ const httpErrorMapper = (err: unknown): HttpFailure => {
     case UserErrCodes.userAlreadyHasAccount: {
       return conflictResponse('A user with the supplied email address already exists');
     }
+    case AccountErrCodes.userAlreadyHasAnAccount: {
+      return conflictResponse('User already has an account');
+    }
     default: {
       return unexpectedErrorResponse();
     }

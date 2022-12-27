@@ -29,13 +29,24 @@ export default class CreateAccounts {
 
   async exec(logger: Logger): Promise< Account> {
     const { sub: userId } = this.authClaims;
-    const existingUser = await this.usersRepository.findOneBy({ id: userId });
+    const [existingUser] = await this.usersRepository.find({
+      where: { id: userId },
+      relations: { account: true },
+    });
     if (!existingUser) {
       logger.info({
         msg: `Could not find a user with id "${userId}"` ,
         authClaims: this.authClaims,
       });
       throw new AccessError(AccountErrCodes.userDoesNotExist);
+    }
+
+    if (existingUser.account) {
+      logger.info({
+        msg: 'User already has an account' ,
+        authClaims: this.authClaims,
+      });
+      throw new AccessError(AccountErrCodes.userAlreadyHasAnAccount);
     }
 
     const account = new Account({
