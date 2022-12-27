@@ -50,6 +50,10 @@ const httpErrorMapper = (err: unknown): HttpFailure => {
     case AccountErrCodes.userAlreadyHasAnAccount: {
       return conflictResponse('User already has an account');
     }
+    case AccountErrCodes.applicationAccountDoesNotExist:
+    case AccountErrCodes.userIsNotAssociatedWithAccount: {
+      return conflictResponse('The account specified does not exist');
+    }
     default: {
       return unexpectedErrorResponse();
     }

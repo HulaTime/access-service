@@ -57,7 +57,7 @@ paths:
           schema:
             type: string
           required: true
-          description: primary id, uuid of the account to be retrieved
+          description: primary id of the account to be retrieved
       responses:
         200:
           description: Successful creation of an account
@@ -65,6 +65,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountResponse'
+
+  /accounts/{id}/policy:
+    post:
+      operationId: CreatePolicy
+      tags:
+        - Policies
+      summary: Create a new policy for an account
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: primary id of the account for the policy
+      responses:
+        200:
+          description: Successful creation of an account policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyResponse'
+
+  /accounts/{id}/invite:
+    post:
+      operationId: InviteAccountUser
+      tags:
+        - Invite
+      summary: Invite a user to an existing account
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully created an email invite for a new user
 
   /accounts/{id}/applications:
     post:
@@ -332,3 +369,20 @@ components:
       properties:
         accessToken:
           type: string
+
+    PolicyResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - accountId
+        - content
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        content:
+          type: object

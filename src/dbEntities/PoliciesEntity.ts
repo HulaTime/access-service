@@ -1,25 +1,20 @@
 import {
-  Column, Entity, PrimaryColumn, OneToOne, JoinColumn,
+  Column, Entity, PrimaryColumn, JoinColumn, ManyToOne,
 } from 'typeorm';
 
 import AccountsEntity from './AccountsEntity';
-import RolesRepository from './RolesEntity';
 
 @Entity()
 export default class Policies {
   @PrimaryColumn({ nullable: false })
   id!: string;
 
-  @OneToOne(() => AccountsEntity, { nullable: false })
+  @ManyToOne(() => AccountsEntity, { nullable: false })
   @JoinColumn()
   account!: string;
 
-  @OneToOne(() => RolesRepository, { nullable: false })
-  @JoinColumn()
-  role!: string;
-
-  @Column({ nullable: false })
-  name!: string;
+  @Column({ nullable: true })
+  name?: string;
 
   @Column({ nullable: true })
   description?: string;

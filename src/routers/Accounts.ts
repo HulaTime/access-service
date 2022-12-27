@@ -78,15 +78,23 @@ router.post<
   components['schemas']['CreateAccountAppResponse'],
   components['schemas']['AccountAppRequest'],
   Record<never, never>,
-  Record<never, never>
+  ResLocals
 >('/:id/applications', async (req, res, next) => {
   try {
     const { body, params: { id: accountId } } = req;
-    const controller = new controllers.CreateAccountApplications(accountId, body);
-    const accountApp = await controller.exec(logger);
+    const { authClaims } = res.locals;
+    const controller = new controllers.CreateAccountApplications(accountId, body, authClaims);
+    const application = await controller.exec(logger);
     return res
       .status(201)
-      .json(stripNullResponseValues(accountApp, areNullValuesSupported));
+      .json(stripNullResponseValues({
+        id: application.id,
+        clientId: application.clientId,
+        clientSecret: application.clientSecret,
+        name: application.name,
+        accountId: application.account.id,
+        description: application.description,
+      }));
   } catch (err) {
     logger.error({ error: serializeError(err) }, 'Failed');
     return next(err);

@@ -13,6 +13,12 @@ export interface paths {
   "/accounts/{id}": {
     get: operations["GetAccount"];
   };
+  "/accounts/{id}/policy": {
+    post: operations["CreatePolicy"];
+  };
+  "/accounts/{id}/invite": {
+    post: operations["InviteAccountUser"];
+  };
   "/accounts/{id}/applications": {
     /** Create a new Account application */
     post: operations["CreateAccountApplication"];
@@ -147,6 +153,13 @@ export interface components {
     AuthenticateRes: {
       accessToken: string;
     };
+    PolicyResponse: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      accountId: string;
+      content: { [key: string]: unknown };
+    };
   };
 }
 
@@ -186,7 +199,7 @@ export interface operations {
   GetAccount: {
     parameters: {
       path: {
-        /** primary id, uuid of the account to be retrieved */
+        /** primary id of the account to be retrieved */
         id: string;
       };
     };
@@ -197,6 +210,33 @@ export interface operations {
           "application/json": components["schemas"]["AccountResponse"];
         };
       };
+    };
+  };
+  CreatePolicy: {
+    parameters: {
+      path: {
+        /** primary id of the account for the policy */
+        id: string;
+      };
+    };
+    responses: {
+      /** Successful creation of an account policy */
+      200: {
+        content: {
+          "application/json": components["schemas"]["PolicyResponse"];
+        };
+      };
+    };
+  };
+  InviteAccountUser: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** Successfully created an email invite for a new user */
+      200: unknown;
     };
   };
   /** Create a new Account application */
