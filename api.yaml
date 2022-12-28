@@ -79,6 +79,11 @@ paths:
             type: string
           required: true
           description: primary id of the account for the policy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyRequest'
       responses:
         200:
           description: Successful creation of an account policy
@@ -369,6 +374,15 @@ components:
       properties:
         accessToken:
           type: string
+
+    PolicyRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - content
+      properties:
+        content:
+          type: object
 
     PolicyResponse:
       type: object

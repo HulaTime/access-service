@@ -13,7 +13,7 @@ export default class Users {
   email!: string;
 
   @Column({ nullable: false })
-  password!: string;
+  passwordHash!: string;
 
   @Column({ nullable: true })
   username?: string;

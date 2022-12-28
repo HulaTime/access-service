@@ -1,7 +1,6 @@
 import * as crypto from 'crypto';
 
 import Logger from 'bunyan';
-import * as argon2 from 'argon2';
 import { v4 as uuid } from 'uuid';
 import { Repository } from 'typeorm';
 import { JwtPayload } from 'jsonwebtoken';
@@ -12,7 +11,7 @@ import { AccessError } from '../../../errors';
 import { AccountsEntity, ApplicationsEntity, UsersEntity } from '../../../dbEntities';
 import AccountErrCodes from '../../../errors/errorCodes/accountErrorCodes';
 import Account from '../../../models/Account';
-import Application from '../../../models/Application';
+import Application, { IApplication } from '../../../models/Application';
 
 export default class CreateAccountApplications {
   private readonly accountsRepository: Repository<AccountsEntity>;
@@ -39,7 +38,7 @@ export default class CreateAccountApplications {
     this.applicationsRepository = appDatasource.getRepository(ApplicationsEntity);
   }
 
-  async exec(logger: Logger): Promise<Application> {
+  async exec(logger: Logger): Promise<{ application: IApplication; clientSecret: string }> {
     const existingAccount = await this.accountsRepository.findOneBy({ id: this.accountId });
     if (!existingAccount) {
       logger.info(`Account with id "${this.accountId}" does not exist`);
@@ -65,16 +64,15 @@ export default class CreateAccountApplications {
       .createHash('sha256')
       .update(crypto.randomBytes(42))
       .digest('hex');
-    const clientSecretHash: string = await argon2.hash(clientSecret);
 
     const application = new Application({
       id: uuid(),
       name: this.data.name,
       clientId: uuid(),
-      clientSecret: clientSecretHash,
       description: this.data.description,
     }, account);
+    await application.setClientSecret(clientSecret);
     await this.applicationsRepository.insert(application);
-    return { ...application, clientSecret };
+    return { application, clientSecret };
   }
 }

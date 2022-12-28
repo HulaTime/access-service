@@ -18,11 +18,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(validationMiddleware);
 
 app.use(`/${serviceName}/authenticate`, routers.authenticate);
+app.use(`/${serviceName}/users`, routers.users.publicRouter);
 
 app.use(authMiddleware);
 
 app.use(`/${serviceName}/accounts`, routers.accounts);
-app.use(`/${serviceName}/users`, routers.users);
+app.use(`/${serviceName}/users`, routers.users.privateRouter);
 
 app.use(errorMiddleware);
 

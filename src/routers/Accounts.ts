@@ -84,13 +84,13 @@ router.post<
     const { body, params: { id: accountId } } = req;
     const { authClaims } = res.locals;
     const controller = new controllers.CreateAccountApplications(accountId, body, authClaims);
-    const application = await controller.exec(logger);
+    const { application, clientSecret } = await controller.exec(logger);
     return res
       .status(201)
       .json(stripNullResponseValues({
         id: application.id,
         clientId: application.clientId,
-        clientSecret: application.clientSecret,
+        clientSecret: clientSecret,
         name: application.name,
         accountId: application.account.id,
         description: application.description,

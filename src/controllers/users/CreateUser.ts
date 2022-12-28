@@ -1,5 +1,4 @@
 import Logger from 'bunyan';
-import * as argon2 from 'argon2';
 import { v4 as uuid } from 'uuid';
 import { Repository } from 'typeorm';
 
@@ -8,6 +7,7 @@ import UserErrorCodes from '../../errors/errorCodes/userErrorCodes';
 import { AccessError } from '../../errors';
 import { components } from '../../../types/api';
 import { UsersEntity } from '../../dbEntities';
+import User from '../../models/User';
 
 export default class CreateAccounts {
   private readonly usersRepository: Repository<UsersEntity>;
@@ -27,15 +27,15 @@ export default class CreateAccounts {
       throw new AccessError(UserErrorCodes.userAlreadyHasAccount);
     }
 
-    const user = {
+    const user = new User( {
       id: uuid(),
       email: this.data.email,
-      password: await argon2.hash(this.data.password),
       username: this.data.username,
-    };
+    });
+    await user.setPassword(this.data.password);
     await this.usersRepository.insert(user);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userResponse } = user;
+    const { passwordHash, ...userResponse } = user;
     return userResponse;
   }
 }

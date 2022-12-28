@@ -1,13 +1,11 @@
 import request from 'supertest';
-import { Like } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import app from '../../../src/app';
 import testDatasource from '../../test-datasource';
-import AccountsEntity from '../../../src/dbEntities/AccountsEntity';
 import UsersRepository from '../../../src/dbEntities/UsersEntity';
 import appDatasource from '../../../db/app-datasource';
-import AccessToken from '../../../src/lib/AccessToken';
+import { dropAllTestData, insertSeedData } from '../seedData';
 
 jest.mock('uuid', () => ({ v4: jest.fn() }));
 
@@ -20,12 +18,12 @@ describe('POST /accounts/:accountId/users', () => {
     await testDatasource.initialize();
   });
 
-  afterEach(async () => {
-    const usersRepository = testDatasource.getRepository(UsersRepository);
-    await usersRepository.delete({ email: Like('%test%') });
+  beforeEach(async () => {
+    await insertSeedData();
+  });
 
-    const accountsEntity = testDatasource.getRepository(AccountsEntity);
-    await accountsEntity.delete({ name: Like('%test%') });
+  afterEach(async () => {
+    await dropAllTestData();
   });
 
   afterAll(async () => {
@@ -40,7 +38,6 @@ describe('POST /accounts/:accountId/users', () => {
     };
     const { body } = await request(app)
       .post('/access/users')
-      .set('authorization', new AccessToken('user').sign())
       .send(inputData)
       .expect(201);
     const { password, ...inputDataMinusPassword } = inputData;
@@ -53,7 +50,7 @@ describe('POST /accounts/:accountId/users', () => {
     const user = await usersRepository.findOneBy({ email: inputData.email });
     expect(user)
       .toMatchObject({ ...inputDataMinusPassword, id: STUB_UUID_RESPONSE });
-    expect(user?.password)
+    expect(user?.passwordHash)
       .not
       .toEqual(password);
   });

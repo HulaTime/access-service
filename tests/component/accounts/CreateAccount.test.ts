@@ -1,25 +1,18 @@
 import request from 'supertest';
-import { Like } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import app from '../../../src/app';
 import testDatasource from '../../test-datasource';
 import AccountsEntity from '../../../src/dbEntities/AccountsEntity';
-import UsersRepository from '../../../src/dbEntities/UsersEntity';
 import appDatasource from '../../../db/app-datasource';
 import AccessToken from '../../../src/lib/AccessToken';
 import { UsersEntity } from '../../../src/dbEntities';
+import { dropAllTestData, insertSeedData } from '../seedData';
+import { noAccountUserTony } from '../seedData/usersData';
 
 jest.mock('uuid', () => ({ v4: jest.fn() }));
 
 const STUB_UUID_RESPONSE = '1923ccee-d63b-46bd-84fb-edf65936a6d7';
-
-const USER_SEED_1: UsersEntity = {
-  id: 'e3e30945-b1e4-4d81-87e3-36983f582258',
-  username: 'mr bojangles',
-  email: 'bobo@test.com',
-  password: 'dfsafalskljfsla',
-};
 
 describe('POST /accounts', () => {
   beforeAll(async () => {
@@ -28,17 +21,12 @@ describe('POST /accounts', () => {
   });
 
   beforeEach(async () => {
-    const usersRepository = testDatasource.getRepository(UsersRepository);
-    await usersRepository.insert(USER_SEED_1);
+    await insertSeedData();
   });
 
-  afterEach(async () => {
-    const usersRepository = testDatasource.getRepository(UsersRepository);
-    await usersRepository.delete({ email: Like('%test%') });
-
-    const accountsEntity = testDatasource.getRepository(AccountsEntity);
-    await accountsEntity.delete({ name: Like('%test%') });
-  });
+  afterEach((async () => {
+    await dropAllTestData();
+  }));
 
   afterAll(async () => {
     await appDatasource.destroy();
@@ -46,7 +34,10 @@ describe('POST /accounts', () => {
   });
 
   describe('Obtained valid user token', () => {
-    const userAccessToken = new AccessToken('user', { sub: USER_SEED_1.id });
+    const userAccessToken = new AccessToken(
+      'user',
+      { sub: noAccountUserTony.user.id },
+    );
 
     const createAccountReqData = {
       name: 'test-account',
@@ -85,7 +76,7 @@ describe('POST /accounts', () => {
         });
       const userEntity = testDatasource.getRepository(UsersEntity);
       const [user] = await userEntity.find({
-        where: { id: USER_SEED_1.id },
+        where: { id: noAccountUserTony.user.id },
         relations: { account: true },
       });
       expect(user?.account).toEqual(body);
@@ -149,7 +140,7 @@ describe('POST /accounts', () => {
       (uuid as jest.Mock).mockReturnValueOnce('3fb016d6-3988-4006-a303-706fa50e90d1');
       (uuid as jest.Mock).mockReturnValueOnce('46007371-7119-4561-bc7d-4e60143ed38a');
 
-      const signedUserAccessToken = new AccessToken('user', { sub: USER_SEED_1.id }).sign();
+      const signedUserAccessToken = new AccessToken('user', { sub: noAccountUserTony.user.id }).sign();
       const inputData = { name: 'test-account', description: 'this is a test account' };
       await request(app)
         .post('/access/accounts')

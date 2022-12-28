@@ -5,11 +5,13 @@ import { serializeError } from 'serialize-error';
 import controllers from '../controllers/users';
 import { components } from '../../types/api';
 
-const router: Router = Router();
+const publicRouter: Router = Router();
+
+const privateRouter: Router = Router();
 
 const logger = createLogger({ name: 'asdf' });
 
-router.post<
+publicRouter.post<
   Record<never, never>,
   components['schemas']['UserResponse'],
   components['schemas']['UserRequest'],
@@ -28,6 +30,6 @@ router.post<
   }
 });
 
-export default router;
+export default { publicRouter, privateRouter };
 
 
