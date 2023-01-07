@@ -18,6 +18,6 @@ export const AccessDataSource = new DataSource({
   entities: [Accounts, Users, Applications, Roles, Policies],
   subscribers: [],
   migrations: ['./db/migrations/*'],
-  migrationsTableName: 'access_migrations',
+  migrationsTableName: 'migrations',
 });
 

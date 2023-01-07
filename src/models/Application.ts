@@ -6,7 +6,6 @@ export interface IApplication {
   id: string;
   name: string;
   clientId: string;
-  clientSecret?: string;
   account: IAccount;
   description?: string;
   setClientSecret: (secret: string) => Promise<void>;
@@ -21,7 +20,7 @@ export default class Application implements IApplication{
 
   clientId: string;
 
-  clientSecret?: string;
+  clientSecretHash?: string;
 
   account: IAccount;
 
@@ -31,12 +30,11 @@ export default class Application implements IApplication{
     this.id = attributes.id;
     this.name = attributes.name;
     this.clientId = attributes.clientId;
-    this.clientSecret = attributes.clientSecret;
     this.description = attributes.description;
     this.account = account;
   }
 
   async setClientSecret(secret: string): Promise<void> {
-    this.clientSecret = await argon2.hash(secret);
+    this.clientSecretHash = await argon2.hash(secret);
   }
 }

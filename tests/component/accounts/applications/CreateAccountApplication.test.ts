@@ -58,7 +58,7 @@ describe('POST /accounts/:id/applications', () => {
       const applicationsRepository = testDatasource.getRepository(ApplicationsEntity);
       const dbAccountApp = await applicationsRepository.findOneBy({ id: body.id });
       expect(dbAccountApp).toBeDefined();
-      const { clientSecret: csa, ...dbData } = dbAccountApp!;
+      const { clientSecretHash: csa, ...dbData } = dbAccountApp!;
       const { clientSecret: csb, accountId, ...responseData } = body;
       expect(dbData).toEqual(responseData);
     });

@@ -153,6 +153,9 @@ export interface components {
     AuthenticateRes: {
       accessToken: string;
     };
+    PolicyRequest: {
+      content: { [key: string]: unknown };
+    };
     PolicyResponse: {
       /** Format: uuid */
       id: string;
@@ -225,6 +228,11 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["PolicyResponse"];
         };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PolicyRequest"];
       };
     };
   };

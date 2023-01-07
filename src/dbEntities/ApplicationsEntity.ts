@@ -3,15 +3,12 @@ import {
 } from 'typeorm';
 
 import AccountsEntity from './AccountsEntity';
+import RolesEntity from './RolesEntity';
 
 @Entity()
 export default class Applications {
   @PrimaryColumn({ nullable: false })
   id!: string
-
-  @ManyToOne(() => AccountsEntity, { nullable: false })
-  @JoinColumn()
-  account!: AccountsEntity
 
   @Column({ nullable: false })
   name!: string
@@ -20,8 +17,15 @@ export default class Applications {
   clientId!: string
 
   @Column({ nullable: false })
-  clientSecret!: string
+  clientSecretHash!: string
 
   @Column({ nullable: true })
   description?: string
+
+  @ManyToOne(() => AccountsEntity, { nullable: false })
+  @JoinColumn()
+  account!: AccountsEntity
+
+  @ManyToOne(() => RolesEntity, (role) => role.id, { nullable: true })
+  roles?: RolesEntity
 }

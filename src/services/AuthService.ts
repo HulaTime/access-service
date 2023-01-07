@@ -66,7 +66,7 @@ export default class AuthService implements IAuthService {
       if (!application) {
         return false;
       }
-      return await argon2.verify(application.clientSecret, this.authCredentials.clientSecret);
+      return await argon2.verify(application.clientSecretHash, this.authCredentials.clientSecret);
     }
     if (
       AuthService.isUserEmailCredentials(this.authCredentials)

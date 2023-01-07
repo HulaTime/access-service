@@ -3,6 +3,7 @@ import {
 } from 'typeorm';
 
 import AccountsEntity from './AccountsEntity';
+import RolesEntity from './RolesEntity';
 
 @Entity()
 export default class Policies {
@@ -25,4 +26,11 @@ export default class Policies {
     nullable: false,
   })
   content!: Record<string, unknown>;
+
+  @ManyToOne(
+    () => RolesEntity,
+    (role) => role.id,
+    { nullable: true },
+  )
+  roles!: RolesEntity
 }
