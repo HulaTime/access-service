@@ -1,8 +1,7 @@
 import {
-  Column, Entity, PrimaryColumn, JoinColumn, OneToOne, ManyToOne,
+  Column, Entity, PrimaryColumn, ManyToOne,
 } from 'typeorm';
 
-import AccountsEntity from './AccountsEntity';
 import RolesEntity from './RolesEntity';
 
 @Entity()
@@ -18,10 +17,6 @@ export default class Users {
 
   @Column({ nullable: true })
   username?: string;
-
-  @OneToOne(() => AccountsEntity, { nullable: true })
-  @JoinColumn()
-  account?: AccountsEntity;
 
   @ManyToOne(() => RolesEntity, (role) => role.id, { nullable: true })
   roles?: RolesEntity
