@@ -66,6 +66,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccountResponse'
 
+  /accounts/{id}/roles:
+    post:
+      operationId: CreateAccountRole
+      tags:
+        - roles
+      summary: Create a role under an account for a role or application
+      description: Create a role under an account for a role or application
+      parameters:
+        - name: authorization
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRoleRequest'
+      responses:
+        201:
+          description: Successful creation of an account policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountRoleResponse'
+
   /accounts/{id}/policy:
     post:
       operationId: CreatePolicy
@@ -238,6 +264,35 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/AccountResponse'
+
+    AccountRoleRequest:
+      type: object
+      required:
+        - name
+        - policyId
+      properties:
+        name:
+          type: string
+          description: The name of the role
+        description:
+          type: string
+          description: A short summary of the responsibilities of the role
+
+    AccountRoleResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: The primary id for the account role
+        name:
+          type: string
+          description: The name of the role
+        description:
+          type: string
+          description: A short summary of the responsibilities of the role
 
     UserRequest:
       type: object
