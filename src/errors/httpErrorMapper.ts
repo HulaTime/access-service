@@ -23,7 +23,7 @@ const conflictResponse = (message?: string): HttpFailure => ({ statusCode: 409, 
 const unauthorizedResponse = (message?: string): HttpFailure => ({ statusCode: 401, message });
 
 const validationResponse = (err: OpenApiErrorBadReq): HttpFailure =>
-  ({ statusCode: 400, message: err.message, errors: err.errors });
+  ({ statusCode: 400, message: 'Bad Request', errors: err.errors.map(e => ({ message: e.message, path: e.path })) });
 
 const httpErrorMapper = (err: unknown): HttpFailure => {
   if (err instanceof OpenApiErrorBadReq) {

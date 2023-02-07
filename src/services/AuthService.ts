@@ -2,6 +2,7 @@ import * as argon2 from 'argon2';
 import { Repository } from 'typeorm';
 
 import { ApplicationsEntity, UsersEntity } from '../dbEntities';
+import { AuthClaims } from '../lib/AccessToken';
 
 export interface IAuthService {
   getClientApplication(): Promise<ApplicationsEntity | null>;
@@ -58,6 +59,20 @@ export default class AuthService implements IAuthService {
       return this.userRepository.findOneBy({ username: this.authCredentials.username });
     }
     return null;
+  }
+
+  async getAuthSubject(authClaims: AuthClaims): Promise<
+    { type: 'user'; entity: UsersEntity | null }
+    | { type: 'application'; entity: ApplicationsEntity | null}
+  > {
+    const { sub, tokenType } = authClaims;
+    if (tokenType === 'user') {
+      return { type: 'user', entity: await this.userRepository.findOneBy({ id: sub }) };
+    }
+    if (tokenType === 'application') {
+      return { type: 'application', entity: await this.appRepository.findOneBy({ id: sub }) };
+    }
+    throw new Error('Unsupported token type');
   }
 
   async verifyCredentials(): Promise<boolean> {
