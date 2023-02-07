@@ -22,22 +22,30 @@ describe('AccessToken class', () => {
   });
 
   describe('Token Claims', () => {
-    it('A new access token can be instantiated with custom claims', () => {
+    test('A new access token can be instantiated with custom claims', () => {
       const accessToken = new AccessToken('user', {
         foo: 'bar',
         hello: 'world',
       });
       expect(accessToken.sign()).toBeDefined();
     });
+
+    test('A signed token can be decoded', () => {
+      const customClaims = { foo: 'bar', hello: 'world' };
+      const accessToken = new AccessToken('application', customClaims);
+      const signedToken = accessToken.sign();
+      const decodedToken = AccessToken.decode(signedToken);
+      expect(decodedToken).toMatchObject(customClaims);
+    });
   });
 
   describe('Signing and Verification', () => {
-    it('A new access token can be generated and should be a string', () =>{
+    test('A new access token can be generated and should be a string', () =>{
       const accessToken = new AccessToken('user');
       expect(typeof accessToken.sign()).toEqual('string');
     });
 
-    it('A new access token can be signed with override keys', () => {
+    test('A new access token can be signed with override keys', () => {
       const accessToken = new AccessToken('user', {
         foo: 'bar',
         hello: 'world',
@@ -50,14 +58,14 @@ describe('AccessToken class', () => {
       expect(signedToken).toBeDefined();
     });
 
-    it('A new access token can be verified', () => {
+    test('A new access token can be verified', () => {
       const accessToken = new AccessToken('user');
       const verifyResult = AccessToken.verify(accessToken.sign());
       expect(verifyResult).toMatchObject({});
       expect(verifyResult.iat).toEqual(expect.any(Number));
     });
 
-    it('A new access token can be verified with overridden keys', () => {
+    test('A new access token can be verified with overridden keys', () => {
       const customClaims = { foo: 'bar', hello: 'world' };
       const accessToken = new AccessToken('user', customClaims);
       const keyPair = new KeyPair('passphrase');
@@ -74,7 +82,7 @@ describe('AccessToken class', () => {
       });
     });
 
-    it('A token should have the token type in the signed claims', () => {
+    test('A token should have the token type in the signed claims', () => {
       const userToken = new AccessToken('user');
       const appToken = new AccessToken('application');
       const signedUserToken = userToken.sign();
@@ -85,7 +93,7 @@ describe('AccessToken class', () => {
   });
 
   describe('Errors', () => {
-    it('An token generated elsewhere can be proved to be invalid', () => {
+    test('An token generated elsewhere can be proved to be invalid', () => {
       const anotherToken = jwt.sign({},`-----BEGIN EC PRIVATE KEY-----
 MIHcAgEBBEIAwljGYwv3PjjX7+upyGGxQPT589e+OGReXTm/ZH9AmG8mH0IagurX
 5+d69rIdR/WT7H9+wAw3UjoUpcgDuGHfqTGgBwYFK4EEACOhgYkDgYYABAAGd+d/

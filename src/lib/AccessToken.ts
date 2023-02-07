@@ -1,31 +1,46 @@
 import * as jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
+import { JwtPayload } from 'jsonwebtoken';
 
 import { accessTokenPassphrase, accessTokenPrivateKey, accessTokenPublicKey } from '../../config/app.config';
 import { AccessError } from '../errors';
 import AccessTokenErrCodes from '../errors/errorCodes/accessTokenErrCodes';
 
+export type AuthClaims = jwt.JwtPayload & { tokenType: 'application' | 'user' }
+
 export default class AccessToken {
   tokenType: 'application' | 'user'
 
-  private _claims: Record<string, unknown> = {};
+  private _claims: AuthClaims;
 
   constructor(type: 'application' | 'user', claims?: Record<string, unknown>) {
     this.tokenType = type;
     this._claims = { ...claims, tokenType: type };
   }
 
-  static verify(token: string, overridePublicKey?: string): jwt.JwtPayload {
+  private static isAuthClaims(claims: jwt.JwtPayload | AuthClaims): claims is AuthClaims {
+    return !!claims.tokenType;
+  }
+
+  static decode(token: string): JwtPayload {
+    const claims = jwt.decode(token);
+    if (Array.isArray(claims) || typeof claims !== 'object' || claims === null) {
+      throw new AccessError(AccessTokenErrCodes.invalidAccessToken);
+    }
+    return claims;
+  }
+
+  static verify(token: string, overridePublicKey?: string): AuthClaims {
     try {
-      const result = jwt.verify(
+      const claims = jwt.verify(
         token,
         overridePublicKey ?? accessTokenPublicKey,
         { algorithms: ['ES512'] },
       );
-      if (typeof result === 'string') {
+      if (typeof claims === 'string' || !AccessToken.isAuthClaims(claims)) {
         throw new AccessError(AccessTokenErrCodes.invalidTokenPayload);
       }
-      return result;
+      return claims;
     } catch (err) {
       if (err instanceof jwt.JsonWebTokenError) {
         throw new AccessError(AccessTokenErrCodes.invalidAccessToken);
