@@ -13,6 +13,10 @@ export interface paths {
   "/accounts/{id}": {
     get: operations["GetAccount"];
   };
+  "/accounts/{id}/roles": {
+    /** Create a role under an account for a role or application */
+    post: operations["CreateAccountRole"];
+  };
   "/accounts/{id}/policy": {
     post: operations["CreatePolicy"];
   };
@@ -73,6 +77,20 @@ export interface components {
       description?: string;
     };
     ListAccountResponse: components["schemas"]["AccountResponse"][];
+    AccountRoleRequest: {
+      /** @description The name of the role */
+      name: string;
+      /** @description A short summary of the responsibilities of the role */
+      description?: string;
+    };
+    AccountRoleResponse: {
+      /** @description The primary id for the account role */
+      id: string;
+      /** @description The name of the role */
+      name: string;
+      /** @description A short summary of the responsibilities of the role */
+      description?: string;
+    };
     UserRequest: {
       /**
        * @description The email address of the user being created
@@ -212,6 +230,27 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["AccountResponse"];
         };
+      };
+    };
+  };
+  /** Create a role under an account for a role or application */
+  CreateAccountRole: {
+    parameters: {
+      header: {
+        authorization?: string;
+      };
+    };
+    responses: {
+      /** Successful creation of an account policy */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AccountRoleResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AccountRoleRequest"];
       };
     };
   };

@@ -7,7 +7,7 @@ const errorMiddleware: ErrorRequestHandler = (err, _req, res, _next) => {
   const httpError = httpErrorMapper(err);
 
   return res.status(httpError.statusCode)
-    .json({ message: httpError.message, errors: httpError.errors });
+    .json({ message: httpError.message, path: httpError.path, errors: httpError.errors });
 };
 
 export default errorMiddleware;

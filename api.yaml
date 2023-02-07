@@ -181,6 +181,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
 
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get a user by id
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Successful creation of an account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
   /authenticate:
     post:
       operationId: Authenticate
@@ -312,10 +331,6 @@ components:
           type: string
           description: The optional username of the user being created
           example: JohnDoe89
-        accountId:
-          type: string
-          maxLength: 200
-          description: An optional short description of the account
 
     UserResponse:
       type: object
@@ -336,10 +351,6 @@ components:
           type: string
           description: The optional username of the user being created
           example: JohnDoe89
-        accountId:
-          type: string
-          maxLength: 200
-          description: An optional short description of the account
 
     AccountAppRequest:
       type: object

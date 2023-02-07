@@ -1,4 +1,7 @@
-import { BadRequest as OpenApiErrorBadReq } from 'express-openapi-validator/dist/framework/types';
+import {
+  BadRequest as OpenApiErrorBadReq,
+  NotFound as OpenApiErrorNotFound,
+} from 'express-openapi-validator/dist/framework/types';
 
 import AccountErrCodes from './errorCodes/accountErrorCodes';
 import AccessTokenErrCodes from './errorCodes/accessTokenErrCodes';
@@ -10,6 +13,7 @@ import { AccessError } from './index';
 export type HttpFailure = {
   statusCode: number;
   message?: string;
+  path?: string;
   errors?: unknown[];
 }
 
@@ -20,14 +24,21 @@ const unexpectedErrorResponse = (msg?: string): HttpFailure => ({
 
 const conflictResponse = (message?: string): HttpFailure => ({ statusCode: 409, message });
 
+const notFoundResponse = (message?: string): HttpFailure => ({ statusCode: 404, message });
+
 const unauthorizedResponse = (message?: string): HttpFailure => ({ statusCode: 401, message });
 
-const validationResponse = (err: OpenApiErrorBadReq): HttpFailure =>
-  ({ statusCode: 400, message: 'Bad Request', errors: err.errors.map(e => ({ message: e.message, path: e.path })) });
+const openApiErrorResponse = (err: OpenApiErrorBadReq | OpenApiErrorNotFound): HttpFailure => {
+  if (err instanceof OpenApiErrorBadReq) {
+    return ({ statusCode: 400, message: 'Bad Request', errors: err.errors.map(e => ({ message: e.message, path: e.path })) });
+  }
+  return ({ statusCode: 404, message: err.message, path: err.path });
+};
+
 
 const httpErrorMapper = (err: unknown): HttpFailure => {
-  if (err instanceof OpenApiErrorBadReq) {
-    return validationResponse(err);
+  if (err instanceof OpenApiErrorBadReq || err instanceof OpenApiErrorNotFound) {
+    return openApiErrorResponse(err);
   }
 
   if (!(err instanceof AccessError)) {
@@ -44,7 +55,7 @@ const httpErrorMapper = (err: unknown): HttpFailure => {
     case AccountErrCodes.userDoesNotExist: {
       return unexpectedErrorResponse('An account already exists for email address provided');
     }
-    case UserErrCodes.userAlreadyHasAccount: {
+    case UserErrCodes.userAlreadyExists: {
       return conflictResponse('A user with the supplied email address already exists');
     }
     case AccountErrCodes.userAlreadyHasAnAccount: {
@@ -53,6 +64,10 @@ const httpErrorMapper = (err: unknown): HttpFailure => {
     case AccountErrCodes.applicationAccountDoesNotExist:
     case AccountErrCodes.userIsNotAssociatedWithAccount: {
       return conflictResponse('The account specified does not exist');
+    }
+    case UserErrCodes.userDoesNotExist:
+    case UserErrCodes.userNotOwnedByCaller: {
+      return notFoundResponse('The user does not exist');
     }
     default: {
       return unexpectedErrorResponse();

@@ -1,5 +1,7 @@
 enum UserErrCodes {
-  userAlreadyHasAccount = 'USER-ERR-001'
+  userAlreadyExists = 'USER-ERR-001',
+  userDoesNotExist = 'USER-ERR-002',
+  userNotOwnedByCaller = 'USER-ERR-003'
 }
 
 export default UserErrCodes;
