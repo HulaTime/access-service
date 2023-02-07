@@ -7,12 +7,7 @@ import appDatasource from '../../../db/app-datasource';
 import AccessToken from '../../../src/lib/AccessToken';
 import { dropAllTestData, insertSeedData } from '../seedData';
 import { alphaAccountApplicationTesco, alphaAccountApplicationTescoClientSecret } from '../seedData/applicationsData';
-import {
-  alphaAccountOwner,
-  alphaAccountOwnerPassword,
-  bravoAccountOwner,
-  bravoAccountOwnerPassword,
-} from '../seedData/usersData';
+import { userTony, userTonyPassword } from '../seedData/usersData';
 
 describe('POST /authenticate', () => {
   beforeAll(async () => {
@@ -74,8 +69,8 @@ describe('POST /authenticate', () => {
   describe('Users', () => {
     describe('Email authentication' , () => {
       const testRequestData = {
-        email: alphaAccountOwner.user.email,
-        password: alphaAccountOwnerPassword,
+        email: userTony.user.email,
+        password: userTonyPassword,
       };
 
       test('I can exchange email and password for an access token', async () => {
@@ -103,7 +98,7 @@ describe('POST /authenticate', () => {
           .expect(200);
         const { accessToken } = body;
         const claims = decode(accessToken);
-        expect(claims?.sub).toEqual(alphaAccountOwner.user.id);
+        expect(claims?.sub).toEqual(userTony.user.id);
       });
 
       test('The access token claims should have a token type of user', async () => {
@@ -122,8 +117,8 @@ describe('POST /authenticate', () => {
 
     describe('Username authentication', () => {
       const testRequestData = {
-        username: bravoAccountOwner.user.username,
-        password: bravoAccountOwnerPassword,
+        username: userTony.user.username,
+        password: userTonyPassword,
       };
 
       test('I can exchange username and password for an access token', async () => {
@@ -151,7 +146,7 @@ describe('POST /authenticate', () => {
           .expect(200);
         const { accessToken } = body;
         const claims = decode(accessToken);
-        expect(claims?.sub).toEqual(bravoAccountOwner.user.id);
+        expect(claims?.sub).toEqual(userTony.user.id);
       });
 
       test('The access token claims should have a token type of user', async () => {
