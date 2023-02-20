@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="true" type="JavaScriptTestRunnerJest">
-    <node-interpreter value="$USER_HOME$/.n/versions/bin/node" />
+    <node-interpreter value="$USER_HOME$/.n/bin/node" />
     <node-options value="" />
     <working-dir value="" />
     <envs />

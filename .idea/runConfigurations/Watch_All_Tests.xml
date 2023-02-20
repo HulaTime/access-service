@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Watch All Tests" type="JavaScriptTestRunnerJest">
-    <node-interpreter value="$USER_HOME$/.n/versions/bin/node" />
+    <node-interpreter value="$USER_HOME$/.n/bin/node" />
     <node-options value="" />
     <jest-package value="$PROJECT_DIR$/node_modules/jest" />
     <working-dir value="$PROJECT_DIR$" />
