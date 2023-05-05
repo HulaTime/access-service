@@ -12,7 +12,7 @@
     "prestart": "npm run build",
     "start": "node dist/src/index.js",
     "db:start": "docker-compose -f docker-compose.postgres.yml up -d",
-    "db:setup": "npm run db:start && sleep 2 && PGPASSWORD=myspoke psql -h 0.0.0.0 -p 54320 -U myspoke -d myspoke -c 'create schema access;'",
+    "db:setup": "npm run db:start && sleep 2 && PGPASSWORD=mydb psql -h 0.0.0.0 -p 54320 -U mydb -d mydb -c 'create schema access;'",
     "db:stop": "docker-compose -f docker-compose.postgres.yml down --remove-orphans",
     "migrations:up": "typeorm-ts-node-commonjs migration:run -d ./db/mig-datasource.ts",
     "migrations:down": "typeorm-ts-node-commonjs migration:revert -d ./db/mig-datasource.ts",

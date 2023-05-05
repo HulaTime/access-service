@@ -3,7 +3,6 @@ import * as crypto from 'crypto';
 import Logger from 'bunyan';
 import { v4 as uuid } from 'uuid';
 import { Repository } from 'typeorm';
-import { JwtPayload } from 'jsonwebtoken';
 
 import appDatasource from '../../../../db/app-datasource';
 import { components } from '../../../../types/api';
@@ -12,6 +11,7 @@ import { AccountsEntity, ApplicationsEntity, UsersEntity } from '../../../dbEnti
 import AccountErrCodes from '../../../errors/errorCodes/accountErrorCodes';
 import Account from '../../../models/Account';
 import Application, { IApplication } from '../../../models/Application';
+import { AuthClaims } from '../../../lib/AccessToken';
 
 export default class CreateAccountApplications {
   private readonly accountsRepository: Repository<AccountsEntity>;
@@ -24,12 +24,12 @@ export default class CreateAccountApplications {
 
   private readonly data: components['schemas']['AccountAppRequest'];
 
-  private readonly authClaims: JwtPayload;
+  private readonly authClaims: AuthClaims;
 
   constructor(
     accountId: string,
     data: components['schemas']['AccountAppRequest'],
-    authClaims: JwtPayload) {
+    authClaims: AuthClaims) {
     this.accountId = accountId;
     this.data = data;
     this.authClaims = authClaims;
@@ -46,18 +46,11 @@ export default class CreateAccountApplications {
     }
     const account = new Account(existingAccount);
     const [authUser] = await this.usersRepository.find(
-      {
-        where: { id: this.authClaims.sub },
-        relations: { account: true },
-      },
+      { where: { id: this.authClaims.sub } },
     );
     if (!authUser) {
       logger.error(`User with id "${this.authClaims.sub}" does not exist`);
       throw new AccessError(AccountErrCodes.userDoesNotExist);
-    }
-    if (authUser.account?.id !== account.id) {
-      logger.info('User is not associated with the account specified');
-      throw new AccessError(AccountErrCodes.userIsNotAssociatedWithAccount);
     }
 
     const clientSecret: string = crypto

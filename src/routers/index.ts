@@ -1,7 +1,7 @@
-import { JwtPayload } from 'jsonwebtoken';
+import { AuthClaims } from '../lib/AccessToken';
 
-import accounts from './Accounts';
-import users from './Users';
+import accounts from './accounts';
+import users from './users';
 import authenticate from './Authenticate';
 
 const noNullReducer = <T> (response: T) => (acc: T, key: keyof T): T => {
@@ -33,7 +33,7 @@ export function stripNullResponseValues
 }
 
 export type ResLocals = {
-  authClaims: JwtPayload;
+  authClaims: AuthClaims;
 }
 
 export default {

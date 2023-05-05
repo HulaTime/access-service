@@ -64,4 +64,6 @@ describe('AccountsRepository', () => {
       expect(result).toEqual(accountAlpha);
     });
   });
+
+  describe('#update', () => {})
 });

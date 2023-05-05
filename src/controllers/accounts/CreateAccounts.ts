@@ -1,7 +1,6 @@
 import Logger from 'bunyan';
 import { v4 as uuid } from 'uuid';
 import { Repository } from 'typeorm';
-import { JwtPayload } from 'jsonwebtoken';
 
 import AccountErrCodes from '../../errors/errorCodes/accountErrorCodes';
 import appDatasource from '../../../db/app-datasource';
@@ -9,7 +8,8 @@ import Account from '../../models/Account';
 import User from '../../models/User';
 import { components } from '../../../types/api';
 import { AccessError } from '../../errors';
-import { AccountsEntity, UsersEntity } from '../../dbEntities';
+import { AccountsEntity, UsersEntity } from '../../database/typeorm/entities';
+import { AuthClaims } from '../../lib/AccessToken';
 
 export default class CreateAccounts {
   private readonly accountsEntity: Repository<AccountsEntity>;
@@ -18,9 +18,9 @@ export default class CreateAccounts {
 
   private readonly data: components['schemas']['AccountRequest'];
 
-  private readonly authClaims: JwtPayload;
+  private readonly authClaims: AuthClaims;
 
-  constructor(data: components['schemas']['AccountRequest'], authClaims: JwtPayload) {
+  constructor(data: components['schemas']['AccountRequest'], authClaims: AuthClaims) {
     this.data = data;
     this.accountsEntity = appDatasource.getRepository(AccountsEntity);
     this.usersRepository = appDatasource.getRepository(UsersEntity);
@@ -29,24 +29,13 @@ export default class CreateAccounts {
 
   async exec(logger: Logger): Promise< Account> {
     const { sub: userId } = this.authClaims;
-    const [existingUser] = await this.usersRepository.find({
-      where: { id: userId },
-      relations: { account: true },
-    });
+    const [existingUser] = await this.usersRepository.find({ where: { id: userId } });
     if (!existingUser) {
       logger.info({
         msg: `Could not find a user with id "${userId}"` ,
         authClaims: this.authClaims,
       });
       throw new AccessError(AccountErrCodes.userDoesNotExist);
-    }
-
-    if (existingUser.account) {
-      logger.info({
-        msg: 'User already has an account' ,
-        authClaims: this.authClaims,
-      });
-      throw new AccessError(AccountErrCodes.userAlreadyHasAnAccount);
     }
 
     const account = new Account({

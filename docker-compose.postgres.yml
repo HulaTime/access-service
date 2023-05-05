@@ -4,8 +4,8 @@ services:
   db:
     image: postgres
     environment:
-      POSTGRES_DB: myspoke
-      POSTGRES_USER: myspoke
-      POSTGRES_PASSWORD: myspoke
+      POSTGRES_DB: mydb
+      POSTGRES_USER: mydb
+      POSTGRES_PASSWORD: mydb
     ports:
       - 54320:5432
